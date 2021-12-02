@@ -1,9 +1,7 @@
-import React, { FC, useMemo } from 'react';
-import { StyleProp, ViewStyle, StyleSheet, View, Text } from 'react-native';
-import { ViewStyleProps } from '@styles';
 import { TransportStation } from '@core/api';
-import Svg, { Circle, G } from 'react-native-svg';
+import React, { FC, useMemo } from 'react';
 import { Marker } from 'react-native-maps';
+import Svg, { Circle, G } from 'react-native-svg';
 
 interface Props {
   item: TransportStation;
@@ -28,7 +26,7 @@ const getIconCode = (size: number) => {
   );
 };
 
-export const StationMarker: FC<Props> = ({ item, size = 12, zIndex = 19, opacity = 1.0, onPress }) => {
+export const StationMarker: FC<Props> = ({ item, size = 12, zIndex = 10, opacity = 1.0, onPress }) => {
   const { lat, lng } = item;
   return useMemo(
     () => (

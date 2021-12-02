@@ -1,6 +1,6 @@
 import { RoundedIconBtn } from '@components/Buttons';
-import { BusMarker, StationMarker } from '@components/Map';
-import { api, routeIdToColor, TransportStation } from '@core/api';
+import { BusMarker, RoutePath, StationMarker } from '@components/Map';
+import { api, defRoutePathColors, routeIdToColor, routeToColor, TransportStation } from '@core/api';
 import { TransportBus, TransportRoute } from '@core/api/types';
 import { coordinates } from '@core/consts';
 import { Log } from '@core/log';
@@ -79,10 +79,16 @@ export const MapScreen: FC<Props> = ({ style }) => {
   const handleBusMarkerPress = (item: TransportBus) => {
     log.debug('handle bus marker press', { item });
     setSelectedBus(item);
+    if (mapRef.current && region) {
+      mapRef.current.animateToRegion({ ...region, latitude: item.lat, longitude: item.lng });
+    }
   };
 
   const handleStationMarkerPress = (item: TransportStation) => {
     log.debug('handle station marker press', { item });
+    if (mapRef.current && region) {
+      mapRef.current.animateToRegion({ ...region, latitude: item.lat, longitude: item.lng });
+    }
   };
 
   const renderBusMarker = (item: TransportBus) => {
@@ -109,6 +115,23 @@ export const MapScreen: FC<Props> = ({ style }) => {
     );
   };
 
+  const renderRoutePath = (item: TransportRoute) => {
+    let colors = defRoutePathColors;
+    let opacity = 0.5;
+    let zIndex = 1;
+    if (selectedBus) {
+      if (selectedBus.rid === item.rid) {
+        opacity = 1.0;
+        zIndex = 2;
+        colors = routeToColor(item);
+      } else {
+        opacity = 0.3;
+        colors = defRoutePathColors;
+      }
+    }
+    return <RoutePath key={`path-${item.rid}`} item={item} colors={colors} opacity={opacity} zIndex={zIndex} />;
+  };
+
   const displayedRoutes = routes.filter(({ rid }) => displayedRoutesIds.includes(rid));
   const displayedBuses = buses.filter(({ rid }) => displayedRoutesIds.includes(rid));
   const displayedStations = routesToStatiosn(displayedRoutes);
@@ -130,11 +153,12 @@ export const MapScreen: FC<Props> = ({ style }) => {
         onRegionChange={newRegion => setRegion(newRegion)}
       >
         {displayedBuses.map(renderBusMarker)}
+        {displayedRoutes.map(renderRoutePath)}
         {displayedStations.map(item => (
           <StationMarker
             key={`station-${item.rid}-${item.sid}`}
             item={item}
-            zIndex={19}
+            zIndex={10}
             size={stationMarkerSize}
             onPress={() => handleStationMarkerPress(item)}
           />

@@ -37,4 +37,5 @@ export const routeIdToColor = (rid: number, routes: TransportRoute[]) => {
 
 export const routeToColor = (route?: TransportRoute) => (route && route.color ? colorSetFromColor(route.color) : defRouteColors);
 
-const defRouteColors = colorSetFromColor(colors.back);
+export const defRouteColors = colorSetFromColor(colors.primary);
+export const defRoutePathColors = colorSetFromColor(colors.primary);
