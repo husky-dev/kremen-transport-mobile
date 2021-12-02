@@ -14,16 +14,19 @@
   },
   "dependencies": {
     "color": "4.0.2",
+    "lodash": "4.17.21",
     "react": "17.0.2",
     "react-native": "0.66.3",
     "react-native-config": "1.4.5",
-    "react-native-maps": "0.29.4"
+    "react-native-maps": "0.29.4",
+    "react-native-svg": "12.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
     "@babel/runtime": "^7.12.5",
     "@types/color": "3.0.2",
     "@types/jest": "^26.0.23",
+    "@types/lodash": "4.14.177",
     "@types/react-native": "^0.66.4",
     "@types/react-test-renderer": "^17.0.1",
     "@typescript-eslint/eslint-plugin": "5.4.0",
