@@ -6,6 +6,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
+    "data:update": "curl https://api.kremen.dev/transport/routes --output src/core/data/routes.json && curl https://api.kremen.dev/transport/buses --output src/core/data/buses.json",
     "test": "jest",
     "lint": "yarn lint:types && yarn lint:eslint",
     "lint:types": "tsc --noEmit --skipLibCheck",

@@ -11,6 +11,7 @@ import {
 } from '@core/api';
 import { TransportBus, TransportRoute } from '@core/api/types';
 import { coordinates } from '@core/consts';
+import { defBusesData, defRoutesData, defSelectedRouteIds } from '@core/data';
 import { Log } from '@core/log';
 import { getStorageParam } from '@core/storage';
 import { getScreenAspectRatio, ViewStyleProps } from '@styles';
@@ -31,8 +32,6 @@ const minLatDelta = 0.00156;
 const maxLatDelta = 110;
 const defLongitudeDelta = defLatitudeDelta * getScreenAspectRatio();
 
-const defSelectedRouteIds = [189, 188, 192, 187, 190, 191];
-
 const mapMarkerSize = 46;
 const stationMarkerSize = Math.round(mapMarkerSize / 2.7);
 
@@ -41,8 +40,8 @@ const routesStorage = getStorageParam('routes', isTransportRouteArrOrUndef);
 const selectedRoutesIdsStorage = getStorageParam('selectedRouteIds', isNumArrOrUndef);
 
 export const MapScreen: FC<Props> = ({ style }) => {
-  const [buses, setBuses] = useState<TransportBus[]>([]);
-  const [routes, setRoutes] = useState<TransportRoute[]>([]);
+  const [buses, setBuses] = useState<TransportBus[]>(defBusesData);
+  const [routes, setRoutes] = useState<TransportRoute[]>(defRoutesData);
   const [region, setRegion] = useState<Region | undefined>();
 
   const [selectedBus, setSelectedBus] = useState<TransportBus | undefined>(undefined);
@@ -52,9 +51,13 @@ export const MapScreen: FC<Props> = ({ style }) => {
   const mapRef = useRef<MapView>(null);
 
   useEffect(() => {
-    loadData();
-    updateData();
+    initData();
   }, []);
+
+  const initData = async () => {
+    await loadData();
+    await updateData();
+  };
 
   const loadData = async () => {
     try {
@@ -65,9 +68,9 @@ export const MapScreen: FC<Props> = ({ style }) => {
         selectedRoutesIdsStorage.get(),
       ]);
       log.debug('load data done');
-      setRoutes(loadedRoutes || []);
-      setBuses(loadedBuses || []);
-      setSelectedRoutesIds(loadedSelectedRouteIds || defSelectedRouteIds);
+      if (loadedRoutes) setRoutes(loadedRoutes);
+      if (loadedBuses) setBuses(loadedBuses);
+      if (loadedSelectedRouteIds) setSelectedRoutesIds(loadedSelectedRouteIds);
     } catch (err: unknown) {
       log.err('load data err', { err: errToStr(err) });
     }
