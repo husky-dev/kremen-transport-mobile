@@ -60,7 +60,7 @@ export const BusMarker: FC<Props> = ({ item, colors, zIndex = 20, size = 38, opa
         {getIconCodeForBus(item, item.offline ? offlineColors : colors, size)}
       </Marker>
     ),
-    [lat, lng, opacity, zIndex, size, offline, direction],
+    [lat, lng, opacity, zIndex, size, offline, direction, colors.light],
   );
 };
 
