@@ -1,4 +1,5 @@
 import { RoundedIconBtn } from '@components/Buttons';
+import { BusMarker } from '@components/Map';
 import { api } from '@core/api';
 import { TransportBus, TransportRoute } from '@core/api/types';
 import { coordinates } from '@core/consts';
@@ -70,6 +71,11 @@ export const MapScreen: FC<Props> = ({ style }) => {
     mapRef.current.animateToRegion({ ...region, latitudeDelta: newLatDelta, longitudeDelta: newLngDelta });
   };
 
+  const handleBusMarkerPress = (item: TransportBus) => {
+    log.debug('handle bus marker press', { item });
+    setSelectedBus(item);
+  };
+
   return (
     <View style={[styles.container, style]}>
       <MapView
@@ -85,7 +91,11 @@ export const MapScreen: FC<Props> = ({ style }) => {
         pitchEnabled={false}
         onPress={handleMapPress}
         onRegionChange={newRegion => setRegion(newRegion)}
-      />
+      >
+        {buses.map(itm => (
+          <BusMarker key={itm.tid} item={itm} onPress={() => handleBusMarkerPress(itm)} />
+        ))}
+      </MapView>
       <View style={styles.controlsPanel}>
         <RoundedIconBtn style={styles.controlsPanelBtn} icon="plus" onPress={handleZoomInPress} />
         <RoundedIconBtn style={styles.controlsPanelBtn} icon="minus" onPress={handleZoomOutPress} />
