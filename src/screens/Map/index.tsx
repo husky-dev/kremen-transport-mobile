@@ -4,25 +4,31 @@ import { TransportBus, TransportRoute } from '@core/api/types';
 import { coordinates } from '@core/consts';
 import { Log } from '@core/log';
 import { getScreenAspectRatio, ViewStyleProps } from '@styles';
-import { errToStr, latLngToLatitudeLongitude } from '@utils';
-import React, { FC, useEffect, useState } from 'react';
+import { errToStr, latLngToLatitudeLongitude, mapRegionToZoom } from '@utils';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import MapView from 'react-native-maps';
+import MapView, { Region } from 'react-native-maps';
 
 const log = Log('screens.Map');
 
 type Props = ViewStyleProps;
 
 const defLatitudeDelta = 0.1;
+const latDeltaStep = 0.5;
+const minLatDelta = 0.00156;
+const maxLatDelta = 110;
 const defLongitudeDelta = defLatitudeDelta * getScreenAspectRatio();
 
 export const MapScreen: FC<Props> = ({ style }) => {
   const [buses, setBuses] = useState<TransportBus[]>([]);
   const [routes, setRoutes] = useState<TransportRoute[]>([]);
+  const [region, setRegion] = useState<Region | undefined>();
 
   const [selectedBus, setSelectedBus] = useState<TransportBus | undefined>(undefined);
   const [selectedStationId, setSelectedStationId] = useState<number | undefined>(undefined);
   const [displayedRoutes, setDisplayedRoutes] = useState<number[]>([189, 188, 192, 187, 190, 191]);
+
+  const mapRef = useRef<MapView>(null);
 
   useEffect(() => {
     updateData();
@@ -46,22 +52,43 @@ export const MapScreen: FC<Props> = ({ style }) => {
     setSelectedStationId(undefined);
   };
 
+  const handleZoomInPress = async () => {
+    log.debug('handle zoom in press');
+    if (!mapRef.current || !region) return;
+    let newLatDelta = region.latitudeDelta * latDeltaStep;
+    if (newLatDelta < minLatDelta) newLatDelta = minLatDelta;
+    const newLngDelta = newLatDelta * getScreenAspectRatio();
+    mapRef.current.animateToRegion({ ...region, latitudeDelta: newLatDelta, longitudeDelta: newLngDelta });
+  };
+
+  const handleZoomOutPress = () => {
+    log.debug('handle zoom out press');
+    if (!mapRef.current || !region) return;
+    let newLatDelta = region.latitudeDelta / latDeltaStep;
+    if (newLatDelta > maxLatDelta) newLatDelta = maxLatDelta;
+    const newLngDelta = newLatDelta * getScreenAspectRatio();
+    mapRef.current.animateToRegion({ ...region, latitudeDelta: newLatDelta, longitudeDelta: newLngDelta });
+  };
+
   return (
     <View style={[styles.container, style]}>
       <MapView
+        ref={mapRef}
         style={styles.map}
         initialRegion={{
           ...latLngToLatitudeLongitude(coordinates.kremen),
           latitudeDelta: defLatitudeDelta,
           longitudeDelta: defLongitudeDelta,
         }}
+        loadingEnabled
         rotateEnabled={false}
         pitchEnabled={false}
         onPress={handleMapPress}
+        onRegionChange={newRegion => setRegion(newRegion)}
       />
       <View style={styles.controlsPanel}>
-        <RoundedIconBtn style={styles.controlsPanelBtn} icon="plus" />
-        <RoundedIconBtn style={styles.controlsPanelBtn} icon="minus" />
+        <RoundedIconBtn style={styles.controlsPanelBtn} icon="plus" onPress={handleZoomInPress} />
+        <RoundedIconBtn style={styles.controlsPanelBtn} icon="minus" onPress={handleZoomOutPress} />
         <RoundedIconBtn style={styles.controlsPanelBtn} icon="location" />
       </View>
     </View>
