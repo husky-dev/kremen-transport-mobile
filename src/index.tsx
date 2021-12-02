@@ -1,13 +1,13 @@
+import MapScreen from '@screens/Map';
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import MapView from 'react-native-maps';
 
 export const App = () => {
-  return <MapView style={styles.container} />;
+  return <MapScreen style={styles.screen} />;
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  screen: { flex: 1 },
 });
 
 export default App;
