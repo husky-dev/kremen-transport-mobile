@@ -26,7 +26,7 @@ jobs:
       env:
         CODEPUSH_TOKEN: ${{secrets.CODEPUSH_TOKEN}}
       run: |
-        npx appcenter codepush release-react \
+        npx appcenter-cli codepush release-react \
           --quiet \
           --plist-file "./ios/CaptainsClub/Info.plist" \
           --app $CODEPUSH_APP_IOS \
