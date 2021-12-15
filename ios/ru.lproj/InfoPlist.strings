@@ -1,0 +1,9 @@
+/* 
+  InfoPlist.strings
+  KremenTransport
+
+  Created by Jaroslav Khorishchenko on 15.12.2021.
+  
+*/
+"CFBundleDisplayName" = "Транспорт";
+"CFBundleName" = "Транспорт";
