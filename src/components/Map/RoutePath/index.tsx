@@ -13,7 +13,7 @@ interface Props {
 export const RoutePath: FC<Props> = ({ item, colors, opacity = 0.7, zIndex = 0 }) => {
   const path = item.path.map(([latitude, longitude]) => ({ latitude, longitude }));
   return useMemo(
-    () => <Polyline coordinates={path} zIndex={zIndex} strokeWidth={5} strokeColor={withAlpha(colors.light, opacity)} />,
+    () => <Polyline coordinates={path} zIndex={zIndex} strokeWidth={3} strokeColor={withAlpha(colors.light, opacity)} />,
     [item.path, colors.light, opacity, zIndex],
   );
 };

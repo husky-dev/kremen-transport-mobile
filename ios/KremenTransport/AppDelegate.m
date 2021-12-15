@@ -36,11 +36,7 @@ static void InitializeFlipper(UIApplication *application) {
                                                    moduleName:@"KremenTransport"
                                             initialProperties:nil];
 
-  if (@available(iOS 13.0, *)) {
-      rootView.backgroundColor = [UIColor systemBackgroundColor];
-  } else {
-      rootView.backgroundColor = [UIColor whiteColor];
-  }
+  rootView.backgroundColor = [UIColor colorWithRed: 0.24 green: 0.50 blue: 0.91 alpha: 1.00];;
 
   self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   UIViewController *rootViewController = [UIViewController new];
