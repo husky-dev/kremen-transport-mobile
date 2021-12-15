@@ -1,0 +1,38 @@
+name: Deploy
+
+# on:
+#   push:
+#     tags:
+#       - '*'
+
+on: [push]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: "Env: set package version"
+      run: >
+        echo "APP_VERSION=$(cat package.json | grep version | head -1 | awk
+        -F: '{ print $2 }' | sed 's/[",\t ]//g')" >> $GITHUB_ENV
+    - name: "Env: setup environment"
+      env:
+        ENVFILE: ${{secrets.ENVFILE_DEV}}
+      run: |
+        echo "$ENVFILE" > .env
+        cat .env >> $GITHUB_ENV
+    - name: 'CodePush: deploy iOS app'
+      env:
+        CODEPUSH_TOKEN: ${{secrets.CODEPUSH_TOKEN}}
+      run: |
+        npx appcenter codepush release-react \
+          --quiet \
+          --plist-file "./ios/CaptainsClub/Info.plist" \
+          --app $CODEPUSH_APP_IOS \
+          --token $CODEPUSH_TOKEN \
+          --deployment-name $CODEPUSH_DEPLOYMENT \
+          --target-binary-version "$CODEPUSH_TARGET_VERSION" \
+          --output-dir build/ios \
+          --description "$CODEPUSH_RELEASE_NOTE" \
+          $CODEPUSH_OPTIONS
