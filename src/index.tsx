@@ -4,6 +4,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import { config } from '@core/config';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 Sentry.init({
   dsn: config.sentry.dsn,
@@ -12,9 +13,11 @@ Sentry.init({
 
 export const App = () => {
   return (
-    <StorageProvider>
-      <MapScreen style={styles.screen} />
-    </StorageProvider>
+    <SafeAreaProvider>
+      <StorageProvider>
+        <MapScreen style={styles.screen} />
+      </StorageProvider>
+    </SafeAreaProvider>
   );
 };
 

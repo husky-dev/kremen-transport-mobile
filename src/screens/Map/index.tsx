@@ -11,7 +11,9 @@ import { isNumArrOrUndef, latLngToLatitudeLongitude } from '@utils';
 import React, { FC, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import MapView, { Region } from 'react-native-maps';
+import { EdgeInsets, useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import MapRoutesPanel from './components/RoutesPanel';
 import { routesToStatiosn } from './utils';
 
 const log = Log('screens.Map');
@@ -123,6 +125,8 @@ export const MapScreen: FC<Props> = ({ style }) => {
   const displayedBuses = buses.filter(({ rid }) => selectedRoutesIds.includes(rid));
   const displayedStations = routesToStatiosn(displayedRoutes);
 
+  const styles = getStyles(useSafeAreaInsets());
+
   return (
     <View style={[styles.container, style]}>
       <MapView
@@ -151,6 +155,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
           />
         ))}
       </MapView>
+      <MapRoutesPanel style={styles.routesPanel} routes={routes} selected={selectedRoutesIds} />
       <View style={styles.controlsPanel}>
         <RoundedIconBtn style={styles.controlsPanelBtn} icon="plus" onPress={handleZoomInPress} />
         <RoundedIconBtn style={styles.controlsPanelBtn} icon="minus" onPress={handleZoomOutPress} />
@@ -160,24 +165,32 @@ export const MapScreen: FC<Props> = ({ style }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {},
-  map: {
-    flex: 1,
-  },
-  controlsPanel: {
-    position: 'absolute',
-    right: 14,
-    bottom: 24,
-    top: 24,
-    zIndex: 2,
-    justifyContent: 'center',
-  },
-  controlsPanelBtn: {
-    marginTop: 4,
-    marginBottom: 4,
-  },
-});
+const getStyles = (insets: EdgeInsets) =>
+  StyleSheet.create({
+    container: {},
+    map: {
+      flex: 1,
+      zIndex: 1,
+    },
+    controlsPanel: {
+      position: 'absolute',
+      right: 14,
+      bottom: 24,
+      top: 24,
+      zIndex: 2,
+      justifyContent: 'center',
+    },
+    controlsPanelBtn: {
+      marginTop: 4,
+      marginBottom: 4,
+    },
+    routesPanel: {
+      zIndex: 2,
+      position: 'absolute',
+      top: 14 + insets.top,
+      left: 14,
+    },
+  });
 
 export type MapScreenProps = Props;
 export default MapScreen;
