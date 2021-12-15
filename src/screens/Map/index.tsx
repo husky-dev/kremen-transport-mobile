@@ -1,22 +1,14 @@
 import { RoundedIconBtn } from '@components/Buttons';
 import { BusMarker, RoutePath, StationMarker } from '@components/Map';
-import {
-  api,
-  defRoutePathColors,
-  isTransportBusArrOrUndef,
-  isTransportRouteArrOrUndef,
-  routeIdToColor,
-  routeToColor,
-  TransportStation,
-} from '@core/api';
+import { defRoutePathColors, routeIdToColor, routeToColor, TransportStation } from '@core/api';
 import { TransportBus, TransportRoute } from '@core/api/types';
 import { coordinates } from '@core/consts';
-import { defBusesData, defRoutesData, defSelectedRouteIds } from '@core/data';
+import { defSelectedRouteIds } from '@core/data';
 import { Log } from '@core/log';
-import { getStorageParam } from '@core/storage';
+import { getStorageParam, useStorage } from '@core/storage';
 import { getScreenAspectRatio, ViewStyleProps } from '@styles';
-import { errToStr, isNumArrOrUndef, latLngToLatitudeLongitude } from '@utils';
-import React, { FC, useEffect, useRef, useState } from 'react';
+import { isNumArrOrUndef, latLngToLatitudeLongitude } from '@utils';
+import React, { FC, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import MapView, { Region } from 'react-native-maps';
 
@@ -35,13 +27,10 @@ const defLongitudeDelta = defLatitudeDelta * getScreenAspectRatio();
 const mapMarkerSize = 46;
 const stationMarkerSize = Math.round(mapMarkerSize / 2.7);
 
-const busesStorage = getStorageParam('buses', isTransportBusArrOrUndef);
-const routesStorage = getStorageParam('routes', isTransportRouteArrOrUndef);
 const selectedRoutesIdsStorage = getStorageParam('selectedRouteIds', isNumArrOrUndef);
 
 export const MapScreen: FC<Props> = ({ style }) => {
-  const [buses, setBuses] = useState<TransportBus[]>(defBusesData);
-  const [routes, setRoutes] = useState<TransportRoute[]>(defRoutesData);
+  const { buses, routes } = useStorage();
   const [region, setRegion] = useState<Region | undefined>();
 
   const [selectedBus, setSelectedBus] = useState<TransportBus | undefined>(undefined);
@@ -49,46 +38,6 @@ export const MapScreen: FC<Props> = ({ style }) => {
   const [selectedRoutesIds, setSelectedRoutesIds] = useState<number[]>(defSelectedRouteIds);
 
   const mapRef = useRef<MapView>(null);
-
-  useEffect(() => {
-    initData();
-  }, []);
-
-  const initData = async () => {
-    await loadData();
-    await updateData();
-  };
-
-  const loadData = async () => {
-    try {
-      log.debug('load data');
-      const [loadedBuses, loadedRoutes, loadedSelectedRouteIds] = await Promise.all([
-        busesStorage.get(),
-        routesStorage.get(),
-        selectedRoutesIdsStorage.get(),
-      ]);
-      log.debug('load data done');
-      if (loadedRoutes) setRoutes(loadedRoutes);
-      if (loadedBuses) setBuses(loadedBuses);
-      if (loadedSelectedRouteIds) setSelectedRoutesIds(loadedSelectedRouteIds);
-    } catch (err: unknown) {
-      log.err('load data err', { err: errToStr(err) });
-    }
-  };
-
-  const updateData = async () => {
-    try {
-      log.debug('updating data');
-      const [newRoutes, newBuses] = await Promise.all([api.routes(), api.buses()]);
-      log.debug('updating data done', { routes: newRoutes.length, buses: newBuses.length });
-      setRoutes(newRoutes);
-      routesStorage.set(newRoutes);
-      setBuses(newBuses);
-      busesStorage.set(newBuses);
-    } catch (err: unknown) {
-      log.err('updating data err', { err: errToStr(err) });
-    }
-  };
 
   const handleMapPress = () => {
     log.debug('handle map press');

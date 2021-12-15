@@ -1,6 +1,6 @@
 import { Log } from '@core/log';
 
-import { TransportBus, TransportPrediction, TransportRoute } from './types';
+import { TransportBus, TransportBusesLocations, TransportPrediction, TransportRoute } from './types';
 import { ApiError, ApiReqOpt, apiReqOptParamsToStr } from './utils';
 
 const log = Log('core.api');
@@ -44,10 +44,13 @@ const getApi = () => {
   };
 
   return {
-    routes: async (): Promise<TransportRoute[]> => apiReq<TransportRoute[]>({ path: `transport/routes` }),
-    buses: async (): Promise<TransportBus[]> => apiReq<TransportBus[]>({ path: `transport/buses` }),
-    stationPrediction: async (sid: number): Promise<TransportPrediction[]> =>
-      apiReq<TransportPrediction[]>({ path: `transport/stations/${sid}/prediction` }),
+    transport: {
+      routes: async (): Promise<TransportRoute[]> => apiReq<TransportRoute[]>({ path: `transport/routes` }),
+      buses: async (): Promise<TransportBus[]> => apiReq<TransportBus[]>({ path: `transport/buses` }),
+      busesLocations: async () => apiReq<TransportBusesLocations>({ path: `transport/buses/locations` }),
+      stationPrediction: async (sid: number): Promise<TransportPrediction[]> =>
+        apiReq<TransportPrediction[]>({ path: `transport/stations/${sid}/prediction` }),
+    },
   };
 };
 

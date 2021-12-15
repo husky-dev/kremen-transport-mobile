@@ -1,6 +1,6 @@
-import { errToStr, isStr, TypeGuard } from '@utils';
-import { Log } from './log';
+import { Log } from '@core/log';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { errToStr, isStr, TypeGuard } from '@utils';
 
 const log = Log('core.storage');
 const storeVersion = `v1`;
