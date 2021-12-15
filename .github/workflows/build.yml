@@ -28,11 +28,24 @@ jobs:
       run: |
         npx appcenter-cli codepush release-react \
           --quiet \
-          --plist-file "./ios/CaptainsClub/Info.plist" \
+          --plist-file "./ios/KremenTransport/Info.plist" \
           --app $CODEPUSH_APP_IOS \
           --token $CODEPUSH_TOKEN \
           --deployment-name $CODEPUSH_DEPLOYMENT \
           --target-binary-version "$CODEPUSH_TARGET_VERSION" \
           --output-dir build/ios \
+          --description "$CODEPUSH_RELEASE_NOTE" \
+          $CODEPUSH_OPTIONS
+    - name: 'CodePush: deploy Android app'
+      env:
+        CODEPUSH_TOKEN: ${{secrets.CODEPUSH_TOKEN}}
+      run: |
+        npx appcenter-cli codepush release-react \
+          --quiet \
+          --app $CODEPUSH_APP_AND \
+          --token $CODEPUSH_TOKEN \
+          --deployment-name $CODEPUSH_DEPLOYMENT \
+          --target-binary-version "$CODEPUSH_TARGET_VERSION" \
+          --output-dir build/and \
           --description "$CODEPUSH_RELEASE_NOTE" \
           $CODEPUSH_OPTIONS
