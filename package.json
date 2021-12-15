@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.15.14",
-    "color": "^4.1.0",
     "lodash": "4.17.21",
     "react": "17.0.2",
     "react-native": "0.66.3",
@@ -27,7 +26,6 @@
   "devDependencies": {
     "@babel/core": "^7.12.9",
     "@babel/runtime": "^7.12.5",
-    "@types/color": "3.0.2",
     "@types/jest": "^26.0.23",
     "@types/lodash": "4.14.177",
     "@types/react-native": "^0.66.4",

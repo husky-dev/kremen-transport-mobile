@@ -1,4 +1,4 @@
-import color from 'color';
+import { colorWithDarken } from '@utils';
 
 export interface ColorsSet {
   light: string;
@@ -14,7 +14,7 @@ export const colorSetFromColor = (val: string): ColorsSet => {
   }
   colorsCache[val] = {
     light: val,
-    dark: color(val).darken(0.5).toString(),
+    dark: colorWithDarken(val, 0.5),
   };
   return colorsCache[val];
 };
@@ -32,10 +32,7 @@ const named = {
   primary: '#3E7FE8',
 };
 
-export const withAlpha = (val: string, alpha: number) => color(val).alpha(alpha).toString();
-
 export const colors = {
   ...base,
   ...named,
-  withAlpha,
 };
