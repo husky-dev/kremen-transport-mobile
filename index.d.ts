@@ -3,6 +3,7 @@ declare module 'react-native-config' {
     APP_ENV?: string;
     APP_LOG_LEVEL?: string;
     GOOGLE_MAPS_API_KEY?: string;
+    SENTRY_DSN?: string;
   }
   export const Config: NativeConfig;
   export default Config;
