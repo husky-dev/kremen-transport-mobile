@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">KremenTransport</string>
+    <string name="app_name">Transport</string>
+    <string moduleConfig="true" name="CodePushDeploymentKey">d6XEUUP2jVuI4fd7yJ7gF6mhrWWe_rQuKYfvf</string>
 </resources>
