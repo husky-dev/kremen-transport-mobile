@@ -135,8 +135,8 @@ android {
         applicationId "com.krementransport"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
     }
     splits {
         abi {
@@ -154,12 +154,10 @@ android {
             keyPassword 'android'
         }
         release {
-            if (project.hasProperty('KREMEN_UPLOAD_STORE_FILE')) {
-                storeFile file(KREMEN_UPLOAD_STORE_FILE)
-                storePassword KREMEN_UPLOAD_STORE_PASSWORD
-                keyAlias KREMEN_UPLOAD_KEY_ALIAS
-                keyPassword KREMEN_UPLOAD_KEY_PASSWORD
-            }
+            storeFile file(ANDROID_KEYSTORE_FILE)
+            storePassword ANDROID_KEYSTORE_PASSWORD
+            keyAlias ANDROID_KEYSTORE_KEY_ALIAS
+            keyPassword ANDROID_KEYSTORE_KEY_PASSWORD
         }
     }
     buildTypes {
