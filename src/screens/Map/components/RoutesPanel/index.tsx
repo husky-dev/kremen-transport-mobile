@@ -4,7 +4,7 @@ import { sortRoutes } from '@core/utils';
 import { ViewStyleProps } from '@styles';
 import { colorWithAlpha, compact } from '@utils';
 import React, { FC } from 'react';
-import { StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 interface Props extends ViewStyleProps {
   routes: TransportRoute[];
@@ -16,13 +16,13 @@ export const MapRoutesPanel: FC<Props> = ({ style, routes, selected, onPress }) 
   const selectedRoutes = sortRoutes(compact(selected.map(rid => routes.find(item => item.rid === rid))));
   return (
     <View style={[styles.container, style]}>
-      <TouchableWithoutFeedback onPress={onPress}>
+      <TouchableOpacity onPress={onPress}>
         <View style={styles.circlesWrap}>
           {selectedRoutes.map(route => (
             <RouteCircle key={route.rid} style={styles.circle} route={route} />
           ))}
         </View>
-      </TouchableWithoutFeedback>
+      </TouchableOpacity>
     </View>
   );
 };

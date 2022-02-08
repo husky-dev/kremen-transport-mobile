@@ -1,5 +1,6 @@
 import { RoundedIconBtn } from '@components/Buttons';
 import { BusMarker, RoutePath, StationMarker } from '@components/Map';
+import TransportIcon from '@components/Transport/Icon';
 import { defRoutePathColors, routeIdToColor, routeToColor, TransportStation } from '@core/api';
 import { TransportBus, TransportRoute } from '@core/api/types';
 import { coordinates } from '@core/consts';
@@ -8,11 +9,12 @@ import { Log } from '@core/log';
 import { getStorageParam, useStorage } from '@core/storage';
 import { getScreenAspectRatio, ViewStyleProps } from '@styles';
 import { isNumArrOrUndef, latLngToLatitudeLongitude } from '@utils';
-import { Actionsheet, Text } from 'native-base';
+import { Actionsheet, HStack, Text, useColorMode, useColorModeValue, VStack } from 'native-base';
 import React, { FC, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import MapView, { Region } from 'react-native-maps';
 import { EdgeInsets, useSafeAreaInsets } from 'react-native-safe-area-context';
+import MapBusInfo from './components/BusInfo';
 import MapRoutesModal from './components/RotuesModal';
 
 import MapRoutesPanel from './components/RoutesPanel';
@@ -71,9 +73,9 @@ export const MapScreen: FC<Props> = ({ style }) => {
   const handleBusMarkerPress = (item: TransportBus) => {
     log.debug('handle bus marker press', { item });
     setSelectedBus(item);
-    if (mapRef.current && region) {
-      mapRef.current.animateToRegion({ ...region, latitude: item.lat, longitude: item.lng });
-    }
+    // if (mapRef.current && region) {
+    //   mapRef.current.animateToRegion({ ...region, latitude: item.lat, longitude: item.lng });
+    // }
   };
 
   const handleStationMarkerPress = (item: TransportStation) => {
@@ -131,6 +133,8 @@ export const MapScreen: FC<Props> = ({ style }) => {
 
   const styles = getStyles(useSafeAreaInsets());
 
+  const { colorMode: theme } = useColorMode();
+
   return (
     <>
       <View style={[styles.container, style]}>
@@ -148,19 +152,25 @@ export const MapScreen: FC<Props> = ({ style }) => {
           onPress={handleMapPress}
           onRegionChange={newRegion => setRegion(newRegion)}
         >
-          {displayedBuses.map(renderBusMarker)}
           {displayedRoutes.map(renderRoutePath)}
           {displayedStations.map(item => (
             <StationMarker
               key={`station-${item.rid}-${item.sid}`}
               item={item}
               zIndex={10}
+              theme={theme === 'dark' ? 'dark' : 'light'}
               size={stationMarkerSize}
               onPress={() => handleStationMarkerPress(item)}
             />
           ))}
+          {displayedBuses.map(renderBusMarker)}
         </MapView>
-        <MapRoutesPanel style={styles.routesPanel} routes={routes} selected={selectedRoutesIds} />
+        <MapRoutesPanel
+          style={styles.routesPanel}
+          routes={routes}
+          selected={selectedRoutesIds}
+          onPress={() => setRoutesModalOpen(true)}
+        />
         <View style={styles.controlsPanel}>
           <RoundedIconBtn style={styles.controlsPanelBtn} icon="bus" onPress={() => setRoutesModalOpen(true)} />
           <RoundedIconBtn style={styles.controlsPanelBtn} icon="plus" onPress={handleZoomInPress} />
@@ -172,11 +182,17 @@ export const MapScreen: FC<Props> = ({ style }) => {
         open={routesModalOpen}
         routes={routes}
         selected={selectedRoutesIds}
+        onSelectedChange={val => setSelectedRoutesIds(val)}
         onClose={() => setRoutesModalOpen(false)}
       />
       <Actionsheet isOpen={!!selectedStationId} onClose={() => setSelectedStationId(undefined)}>
         <Actionsheet.Content>
-          <Text>{'Hello'}</Text>
+          <Text>{'Station'}</Text>
+        </Actionsheet.Content>
+      </Actionsheet>
+      <Actionsheet isOpen={!!selectedBus} onClose={() => setSelectedBus(undefined)}>
+        <Actionsheet.Content pl={8} pr={8}>
+          {!!selectedBus && <MapBusInfo item={selectedBus} route={routes.find(itm => itm.rid === selectedBus.rid)} />}
         </Actionsheet.Content>
       </Actionsheet>
     </>
