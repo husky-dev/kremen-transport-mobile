@@ -8,6 +8,7 @@ import { Log } from '@core/log';
 import { getStorageParam, useStorage } from '@core/storage';
 import { getScreenAspectRatio, ViewStyleProps } from '@styles';
 import { isNumArrOrUndef, latLngToLatitudeLongitude } from '@utils';
+import { Actionsheet, Text } from 'native-base';
 import React, { FC, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import MapView, { Region } from 'react-native-maps';
@@ -77,9 +78,10 @@ export const MapScreen: FC<Props> = ({ style }) => {
 
   const handleStationMarkerPress = (item: TransportStation) => {
     log.debug('handle station marker press', { item });
-    if (mapRef.current && region) {
-      mapRef.current.animateToRegion({ ...region, latitude: item.lat, longitude: item.lng });
-    }
+    // if (mapRef.current && region) {
+    //   mapRef.current.animateToRegion({ ...region, latitude: item.lat, longitude: item.lng });
+    // }
+    setSelectedStationId(item.sid);
   };
 
   const renderBusMarker = (item: TransportBus) => {
@@ -172,6 +174,11 @@ export const MapScreen: FC<Props> = ({ style }) => {
         selected={selectedRoutesIds}
         onClose={() => setRoutesModalOpen(false)}
       />
+      <Actionsheet isOpen={!!selectedStationId} onClose={() => setSelectedStationId(undefined)}>
+        <Actionsheet.Content>
+          <Text>{'Hello'}</Text>
+        </Actionsheet.Content>
+      </Actionsheet>
     </>
   );
 };

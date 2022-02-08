@@ -109,6 +109,7 @@ export const MapRoutesModal: FC<Props> = ({ style, routes, selected, open, onClo
         <Modal.Header>{`Маршрути`}</Modal.Header>
         <SectionList
           w="100%"
+          initialNumToRender={10}
           sections={sections}
           keyExtractor={itm => `${itm.rid}`}
           renderItem={renderItem}

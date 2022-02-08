@@ -1,6 +1,6 @@
 import { TransportStation } from '@core/api';
 import React, { FC, useMemo } from 'react';
-import { Marker } from 'react-native-maps';
+import { MapEvent, Marker } from 'react-native-maps';
 import Svg, { Circle, G } from 'react-native-svg';
 
 interface Props {
@@ -28,9 +28,13 @@ const getIconCode = (size: number) => {
 
 export const StationMarker: FC<Props> = ({ item, size = 12, zIndex = 10, opacity = 1.0, onPress }) => {
   const { lat, lng } = item;
+  const handlePress = (e: MapEvent<{ action: 'marker-press'; id: string }>) => {
+    e.stopPropagation();
+    onPress && onPress();
+  };
   return useMemo(
     () => (
-      <Marker coordinate={{ latitude: lat, longitude: lng }} zIndex={zIndex} opacity={opacity} onPress={onPress}>
+      <Marker coordinate={{ latitude: lat, longitude: lng }} zIndex={zIndex} opacity={opacity} onPress={handlePress}>
         {getIconCode(size)}
       </Marker>
     ),
