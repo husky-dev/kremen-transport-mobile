@@ -2,25 +2,27 @@ import { RouteCircle } from '@components/Transport';
 import { TransportRoute } from '@core/api';
 import { sortRoutes } from '@core/utils';
 import { ViewStyleProps } from '@styles';
-import { colorWithAlpha } from '@utils';
-import { compact } from 'lodash';
+import { colorWithAlpha, compact } from '@utils';
 import React, { FC } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 
 interface Props extends ViewStyleProps {
   routes: TransportRoute[];
   selected: number[];
+  onPress?: () => void;
 }
 
-export const MapRoutesPanel: FC<Props> = ({ style, routes, selected }) => {
+export const MapRoutesPanel: FC<Props> = ({ style, routes, selected, onPress }) => {
   const selectedRoutes = sortRoutes(compact(selected.map(rid => routes.find(item => item.rid === rid))));
   return (
     <View style={[styles.container, style]}>
-      <View style={styles.circlesWrap}>
-        {selectedRoutes.map(route => (
-          <RouteCircle key={route.rid} style={styles.circle} route={route} />
-        ))}
-      </View>
+      <TouchableWithoutFeedback onPress={onPress}>
+        <View style={styles.circlesWrap}>
+          {selectedRoutes.map(route => (
+            <RouteCircle key={route.rid} style={styles.circle} route={route} />
+          ))}
+        </View>
+      </TouchableWithoutFeedback>
     </View>
   );
 };

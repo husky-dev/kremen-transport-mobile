@@ -1,34 +1,31 @@
 import { colors, ViewStyleProps } from '@styles';
+import { select } from '@utils';
 import React, { FC } from 'react';
-import { ImageSourcePropType, StyleSheet, TouchableOpacity, View, Image } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import plusIcon from './assets/plus.png';
-import minusIcon from './assets/minus.png';
+import busIcon from './assets/bus.png';
 import locationIcon from './assets/location.png';
+import minusIcon from './assets/minus.png';
+import plusIcon from './assets/plus.png';
 
 interface Props extends ViewStyleProps {
   icon: RoundedIconBtnType;
   onPress?: () => void;
 }
 
-type RoundedIconBtnType = 'plus' | 'minus' | 'location';
-
-const getIcon = (icon: RoundedIconBtnType): ImageSourcePropType => {
-  switch (icon) {
-    case 'plus':
-      return plusIcon;
-    case 'minus':
-      return minusIcon;
-    case 'location':
-      return locationIcon;
-  }
-};
+type RoundedIconBtnType = 'plus' | 'minus' | 'location' | 'bus';
 
 export const RoundedIconBtn: FC<Props> = ({ style, icon, onPress }) => {
+  const iconSrc = select(icon, {
+    plus: plusIcon,
+    minus: minusIcon,
+    location: locationIcon,
+    bus: busIcon,
+  });
   return (
     <TouchableOpacity style={[styles.container, style]} onPress={onPress}>
       <View style={styles.btn}>
-        <Image style={styles.icon} source={getIcon(icon)} />
+        <Image style={styles.icon} source={iconSrc} />
       </View>
     </TouchableOpacity>
   );

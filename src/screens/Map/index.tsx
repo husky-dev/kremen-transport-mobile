@@ -12,6 +12,7 @@ import React, { FC, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import MapView, { Region } from 'react-native-maps';
 import { EdgeInsets, useSafeAreaInsets } from 'react-native-safe-area-context';
+import MapRoutesModal from './components/RotuesModal';
 
 import MapRoutesPanel from './components/RoutesPanel';
 import { routesToStatiosn } from './utils';
@@ -38,6 +39,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
   const [selectedBus, setSelectedBus] = useState<TransportBus | undefined>(undefined);
   const [selectedStationId, setSelectedStationId] = useState<number | undefined>(undefined);
   const [selectedRoutesIds, setSelectedRoutesIds] = useState<number[]>(defSelectedRouteIds);
+  const [routesModalOpen, setRoutesModalOpen] = useState<boolean>(false);
 
   const mapRef = useRef<MapView>(null);
 
@@ -128,40 +130,49 @@ export const MapScreen: FC<Props> = ({ style }) => {
   const styles = getStyles(useSafeAreaInsets());
 
   return (
-    <View style={[styles.container, style]}>
-      <MapView
-        ref={mapRef}
-        style={styles.map}
-        initialRegion={{
-          ...latLngToLatitudeLongitude(coordinates.kremen),
-          latitudeDelta: defLatitudeDelta,
-          longitudeDelta: defLongitudeDelta,
-        }}
-        loadingEnabled
-        rotateEnabled={false}
-        pitchEnabled={false}
-        onPress={handleMapPress}
-        onRegionChange={newRegion => setRegion(newRegion)}
-      >
-        {displayedBuses.map(renderBusMarker)}
-        {displayedRoutes.map(renderRoutePath)}
-        {displayedStations.map(item => (
-          <StationMarker
-            key={`station-${item.rid}-${item.sid}`}
-            item={item}
-            zIndex={10}
-            size={stationMarkerSize}
-            onPress={() => handleStationMarkerPress(item)}
-          />
-        ))}
-      </MapView>
-      <MapRoutesPanel style={styles.routesPanel} routes={routes} selected={selectedRoutesIds} />
-      <View style={styles.controlsPanel}>
-        <RoundedIconBtn style={styles.controlsPanelBtn} icon="plus" onPress={handleZoomInPress} />
-        <RoundedIconBtn style={styles.controlsPanelBtn} icon="minus" onPress={handleZoomOutPress} />
-        <RoundedIconBtn style={styles.controlsPanelBtn} icon="location" />
+    <>
+      <View style={[styles.container, style]}>
+        <MapView
+          ref={mapRef}
+          style={styles.map}
+          initialRegion={{
+            ...latLngToLatitudeLongitude(coordinates.kremen),
+            latitudeDelta: defLatitudeDelta,
+            longitudeDelta: defLongitudeDelta,
+          }}
+          loadingEnabled
+          rotateEnabled={false}
+          pitchEnabled={false}
+          onPress={handleMapPress}
+          onRegionChange={newRegion => setRegion(newRegion)}
+        >
+          {displayedBuses.map(renderBusMarker)}
+          {displayedRoutes.map(renderRoutePath)}
+          {displayedStations.map(item => (
+            <StationMarker
+              key={`station-${item.rid}-${item.sid}`}
+              item={item}
+              zIndex={10}
+              size={stationMarkerSize}
+              onPress={() => handleStationMarkerPress(item)}
+            />
+          ))}
+        </MapView>
+        <MapRoutesPanel style={styles.routesPanel} routes={routes} selected={selectedRoutesIds} />
+        <View style={styles.controlsPanel}>
+          <RoundedIconBtn style={styles.controlsPanelBtn} icon="bus" onPress={() => setRoutesModalOpen(true)} />
+          <RoundedIconBtn style={styles.controlsPanelBtn} icon="plus" onPress={handleZoomInPress} />
+          <RoundedIconBtn style={styles.controlsPanelBtn} icon="minus" onPress={handleZoomOutPress} />
+          <RoundedIconBtn style={styles.controlsPanelBtn} icon="location" />
+        </View>
       </View>
-    </View>
+      <MapRoutesModal
+        open={routesModalOpen}
+        routes={routes}
+        selected={selectedRoutesIds}
+        onClose={() => setRoutesModalOpen(false)}
+      />
+    </>
   );
 };
 
