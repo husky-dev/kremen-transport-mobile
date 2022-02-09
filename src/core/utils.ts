@@ -5,12 +5,9 @@ import { TransportRoute } from './api';
 
 const defRouteColors = colorSetFromColor(colors.back);
 
-export const clearRouteNumber = (val: string): string => {
-  let mod: string = val.replace(/^[ТT]/g, '');
-  mod = mod.trim();
-  mod = mod.toUpperCase();
-  return mod;
-};
+export const clearRouteNumber = (val: string): string => val.replace(/^[ТT]/g, '').trim().toUpperCase();
+
+export const clearRouteNumberTransportInfo = (val: string): string => val.replace(/^[ТT]/g, '').trim();
 
 export const routeToColor = (route?: TransportRoute) => (route && route.color ? colorSetFromColor(route.color) : defRouteColors);
 

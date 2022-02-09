@@ -3,6 +3,7 @@ import { TransportRoute } from '@core/api';
 import { sortRoutes } from '@core/utils';
 import { ViewStyleProps } from '@styles';
 import { colorWithAlpha, compact } from '@utils';
+import { Box } from 'native-base';
 import React, { FC } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
@@ -15,7 +16,7 @@ interface Props extends ViewStyleProps {
 export const MapRoutesPanel: FC<Props> = ({ style, routes, selected, onPress }) => {
   const selectedRoutes = sortRoutes(compact(selected.map(rid => routes.find(item => item.rid === rid))));
   return (
-    <View style={[styles.container, style]}>
+    <Box style={[styles.container, style]} pb="5px" pt="5px" pl="2px" pr="2px" borderRadius={3}>
       <TouchableOpacity onPress={onPress}>
         <View style={styles.circlesWrap}>
           {selectedRoutes.map(route => (
@@ -23,18 +24,13 @@ export const MapRoutesPanel: FC<Props> = ({ style, routes, selected, onPress }) 
           ))}
         </View>
       </TouchableOpacity>
-    </View>
+    </Box>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colorWithAlpha('#ffffff', 0.7),
-    paddingTop: 5,
-    paddingBottom: 5,
-    paddingLeft: 2,
-    paddingRight: 2,
-    borderRadius: 3,
   },
   circlesWrap: {
     flexDirection: 'row',

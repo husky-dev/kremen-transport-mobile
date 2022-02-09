@@ -12,7 +12,7 @@ interface Props extends ViewStyleProps {
   backgroundColor?: string;
 }
 
-export const TransportIcon: FC<Props> = ({ style, type, size = 48, backgroundColor }) => {
+export const TransportBusRoundedIcon: FC<Props> = ({ style, type, size = 48, backgroundColor }) => {
   return (
     <Avatar
       style={style}
@@ -23,5 +23,5 @@ export const TransportIcon: FC<Props> = ({ style, type, size = 48, backgroundCol
   );
 };
 
-export type TransportIconProps = Props;
-export default TransportIcon;
+export type TransportBusRoundedIconProps = Props;
+export default TransportBusRoundedIcon;

@@ -1,17 +1,33 @@
-import { isBool, isErr, isNull, isNum, isStr, isUndef } from './types';
+import { isBool, isErr, isNull, isNum, isStr, isUnknownDict, isFunc } from './types';
 
-export const errToStr = (val: unknown): string => {
-  if (isErr(val)) {
-    return val.message;
+/**
+ * Convert unknown error to string
+ * @param err - Error, string, number or an object with `toString()` property
+ */
+export const errToStr = (err: unknown): string => {
+  if (isErr(err)) {
+    return err.message;
   }
-  if (isStr(val) || isNum(val)) {
-    return `${val}`;
+  if (isStr(err)) {
+    return err;
   }
-  if (isBool(val)) {
-    return val ? 'true' : 'false';
+  if (isNum(err) || isBool(err) || isNull(err)) {
+    return `${err}`;
   }
-  if (isNull(val) || isUndef(val)) {
-    return '';
+  if (isUnknownDict(err) && isStr(err.message)) {
+    return err.message;
+  }
+  if (isUnknownDict(err) && isFunc(err.toString)) {
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
+    return err.toString();
   }
   return '';
+};
+
+export const numToTimeStr = (val: number): { numStr: string; metric: string } => {
+  if (val < 60) {
+    return { numStr: `${val}`, metric: 'с' };
+  }
+  const mins = Math.ceil(val / 60);
+  return { numStr: `${mins}`, metric: 'хв' };
 };

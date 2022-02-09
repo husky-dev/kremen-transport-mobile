@@ -1,6 +1,5 @@
 import { RoundedIconBtn } from '@components/Buttons';
 import { BusMarker, RoutePath, StationMarker } from '@components/Map';
-import TransportIcon from '@components/Transport/Icon';
 import { defRoutePathColors, routeIdToColor, routeToColor, TransportStation } from '@core/api';
 import { TransportBus, TransportRoute } from '@core/api/types';
 import { coordinates } from '@core/consts';
@@ -9,15 +8,16 @@ import { Log } from '@core/log';
 import { getStorageParam, useStorage } from '@core/storage';
 import { getScreenAspectRatio, ViewStyleProps } from '@styles';
 import { isNumArrOrUndef, latLngToLatitudeLongitude } from '@utils';
-import { Actionsheet, HStack, Text, useColorMode, useColorModeValue, VStack } from 'native-base';
+import { Actionsheet } from 'native-base';
 import React, { FC, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import MapView, { Region } from 'react-native-maps';
 import { EdgeInsets, useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import MapBusInfo from './components/BusInfo';
 import MapRoutesModal from './components/RotuesModal';
-
 import MapRoutesPanel from './components/RoutesPanel';
+import MapStationInfo from './components/StationInfo';
 import { routesToStatiosn } from './utils';
 
 const log = Log('screens.Map');
@@ -130,10 +130,9 @@ export const MapScreen: FC<Props> = ({ style }) => {
   const displayedRoutes = routes.filter(({ rid }) => selectedRoutesIds.includes(rid));
   const displayedBuses = buses.filter(({ rid }) => selectedRoutesIds.includes(rid));
   const displayedStations = routesToStatiosn(displayedRoutes);
+  const selectedStation = selectedStationId ? displayedStations.find(itm => itm.sid === selectedStationId) : undefined;
 
   const styles = getStyles(useSafeAreaInsets());
-
-  const { colorMode: theme } = useColorMode();
 
   return (
     <>
@@ -158,7 +157,6 @@ export const MapScreen: FC<Props> = ({ style }) => {
               key={`station-${item.rid}-${item.sid}`}
               item={item}
               zIndex={10}
-              theme={theme === 'dark' ? 'dark' : 'light'}
               size={stationMarkerSize}
               onPress={() => handleStationMarkerPress(item)}
             />
@@ -186,9 +184,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
         onClose={() => setRoutesModalOpen(false)}
       />
       <Actionsheet isOpen={!!selectedStationId} onClose={() => setSelectedStationId(undefined)}>
-        <Actionsheet.Content>
-          <Text>{'Station'}</Text>
-        </Actionsheet.Content>
+        <Actionsheet.Content>{!!selectedStation && <MapStationInfo item={selectedStation} />}</Actionsheet.Content>
       </Actionsheet>
       <Actionsheet isOpen={!!selectedBus} onClose={() => setSelectedBus(undefined)}>
         <Actionsheet.Content pl={8} pr={8}>
@@ -222,7 +218,7 @@ const getStyles = (insets: EdgeInsets) =>
       zIndex: 2,
       position: 'absolute',
       top: 14 + insets.top,
-      left: 14,
+      right: 14,
     },
   });
 

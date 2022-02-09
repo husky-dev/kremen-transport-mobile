@@ -1,6 +1,6 @@
 import { offlineColors, TransportBus, TransportType } from '@core/api';
 import { ColorsSet } from '@styles';
-import React, { FC, useMemo } from 'react';
+import React, { FC } from 'react';
 import { MapEvent, Marker } from 'react-native-maps';
 import Svg, { G, Path } from 'react-native-svg';
 
@@ -46,28 +46,23 @@ const getIconCodeForBus = (bus: TransportBus, colors: ColorsSet, size: number) =
 };
 
 export const BusMarker: FC<Props> = ({ item, colors, zIndex = 20, size = 38, opacity = 1.0, onPress }) => {
-  const { lat, lng, offline, direction } = item;
-
   const handlePress = (event: MapEvent<{ action: 'marker-press'; id: string }>) => {
     event.preventDefault();
     event.stopPropagation();
     onPress && onPress();
   };
 
-  return useMemo(
-    () => (
-      <Marker
-        onPress={handlePress}
-        coordinate={{ latitude: item.lat, longitude: item.lng }}
-        tracksViewChanges={false}
-        anchor={{ x: 0.5, y: 0.8 }}
-        opacity={opacity}
-        zIndex={zIndex}
-      >
-        {getIconCodeForBus(item, item.offline ? offlineColors : colors, size)}
-      </Marker>
-    ),
-    [lat, lng, opacity, zIndex, size, offline, direction, colors.light],
+  return (
+    <Marker
+      onPress={handlePress}
+      coordinate={{ latitude: item.lat, longitude: item.lng }}
+      tracksViewChanges={false}
+      anchor={{ x: 0.5, y: 0.8 }}
+      opacity={opacity}
+      zIndex={zIndex}
+    >
+      {getIconCodeForBus(item, item.offline ? offlineColors : colors, size)}
+    </Marker>
   );
 };
 

@@ -6,6 +6,6 @@ export const theme = extendTheme({
     primary: colors.primary,
   },
   config: {
-    initialColorMode: 'dark', // Changing initialColorMode to 'dark'
+    initialColorMode: 'light', // Changing initialColorMode to 'dark'
   },
 });

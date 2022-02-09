@@ -7,7 +7,7 @@ import { Box, Heading, HStack, SectionList, Text, useColorMode, VStack } from 'n
 import React, { FC } from 'react';
 import { SectionListData, SectionListRenderItem, StyleSheet, TouchableOpacity } from 'react-native';
 
-import TransportIcon from '../Icon';
+import { TransportBusRoundedIcon } from '..';
 
 interface Props extends ViewStyleProps {
   items: TransportRoute[];
@@ -54,26 +54,13 @@ export const TransportRoutesList: FC<Props> = ({ style, selectedSectionIds, item
           pr="5"
           py="2"
         >
-          <HStack space={3} justifyContent="space-between">
-            <TransportIcon size={48} type={item.type} backgroundColor={item.color} />
+          <HStack space={3} justifyContent="space-between" alignItems="center">
+            <TransportBusRoundedIcon size={48} type={item.type} backgroundColor={item.color} />
             <VStack flex="1">
-              <Text
-                _dark={{
-                  color: 'warmGray.50',
-                }}
-                color="coolGray.800"
-                bold
-              >
+              <Text _dark={{ color: 'warmGray.50' }} color="coolGray.800" bold fontSize="md">
                 {clearRouteNumber(item.number)}
               </Text>
-              <Text
-                color="coolGray.600"
-                _dark={{
-                  color: 'warmGray.200',
-                }}
-                fontSize={12}
-                numberOfLines={1}
-              >
+              <Text color="coolGray.600" _dark={{ color: 'warmGray.200' }} fontSize="sm">
                 {item.name}
               </Text>
             </VStack>

@@ -1,7 +1,7 @@
-import TransportIcon from '@components/Transport/Icon';
+import { TransportBusRoundedIcon } from '@components/Transport';
 import { TransportBus, TransportRoute } from '@core/api';
 import { clearRouteNumber } from '@core/utils';
-import { HStack, VStack, Text } from 'native-base';
+import { HStack, Text, VStack } from 'native-base';
 import React, { FC } from 'react';
 
 interface Props {
@@ -10,9 +10,14 @@ interface Props {
 }
 
 export const MapBusInfo: FC<Props> = ({ item, route }) => {
+  const getTitle = () => {
+    const parts: string[] = [item.name];
+    if (route) parts.push(`(маршрут: ${clearRouteNumber(route.number)})`);
+    return parts.join(' ');
+  };
   return (
     <HStack w="100%" space={3} alignItems="center">
-      <TransportIcon type={item.type} backgroundColor={route?.color} />
+      <TransportBusRoundedIcon type={item.type} backgroundColor={route?.color} />
       <VStack>
         <Text
           _dark={{
@@ -21,7 +26,7 @@ export const MapBusInfo: FC<Props> = ({ item, route }) => {
           color="coolGray.800"
           bold
         >
-          {clearRouteNumber(item.name)}
+          {getTitle()}
         </Text>
         {!!route && (
           <Text

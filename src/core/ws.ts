@@ -81,7 +81,9 @@ export const useWebScockets = ({ onOpen, onClose, onMessage, onError }: WsOpt = 
     };
 
     cn.onerror = (err: unknown) => {
-      log.err('on err', { err: errToStr(err) });
+      const msg = errToStr(err);
+      if (msg.toLocaleLowerCase().indexOf('socket is not connected') >= 0) return;
+      log.err('on err', { msg });
       cn.close();
       if (onError) {
         onError();
