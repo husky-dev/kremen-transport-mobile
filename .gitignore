@@ -60,4 +60,7 @@ buck-out/
 /ios/Pods/
 
 .env
+.env.dev
+.env.prd
+
 __pycache__

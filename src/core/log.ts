@@ -1,36 +1,30 @@
 /* eslint-disable no-console */
 import { select, UnknownDict } from '@utils';
 
-import { config } from './config';
+import { AppLogLevel, config } from './config';
 import { addSentryBreadcumb, captureSentryMessage, SentrySeverity } from './sentry';
 
-type LogLevel = 'none' | 'err' | 'warn' | 'info' | 'debug' | 'trace';
-
-const logLevelToNum = (val: LogLevel): number =>
+const logLevelToNum = (val: AppLogLevel): number =>
   select(val, {
-    none: -1,
-    err: 0,
+    error: 0,
     warn: 1,
     info: 2,
     debug: 3,
-    trace: 4,
   });
 
-const logLevelToSymbol = (val: LogLevel): string =>
+const logLevelToSymbol = (val: AppLogLevel): string =>
   select(val, {
-    none: '',
-    err: 'x',
+    error: 'x',
     warn: '!',
     info: '+',
     debug: '-',
-    trace: '*',
   });
 
 export const Log = (m?: string) => {
-  const level = logLevelToNum(config.env === 'production' ? 'none' : 'debug');
+  const level = logLevelToNum(config.log.level);
 
   interface LogOpt {
-    level: LogLevel;
+    level: AppLogLevel;
     msg: string;
     meta?: unknown;
   }
@@ -43,7 +37,7 @@ export const Log = (m?: string) => {
     switch (opt.level) {
       case 'info':
         return opt.meta ? console.info(msg, JSON.stringify(opt.meta)) : console.info(msg);
-      case 'err':
+      case 'error':
         return opt.meta ? console.error(msg, JSON.stringify(opt.meta)) : console.error(msg);
       case 'warn':
         return opt.meta ? console.warn(msg, JSON.stringify(opt.meta)) : console.warn(msg);
@@ -55,7 +49,7 @@ export const Log = (m?: string) => {
   return {
     err: (msg: string, meta?: UnknownDict) => {
       captureSentryMessage(msg, SentrySeverity.Error, meta);
-      logWithOpt({ msg, meta, level: 'err' });
+      logWithOpt({ msg, meta, level: 'error' });
     },
     warn: (msg: string, meta?: UnknownDict) => {
       captureSentryMessage(msg, SentrySeverity.Warning, meta);
@@ -69,7 +63,6 @@ export const Log = (m?: string) => {
       addSentryBreadcumb(msg, SentrySeverity.Debug, meta);
       logWithOpt({ msg, meta, level: 'debug' });
     },
-    trace: (msg: string, meta?: UnknownDict) => logWithOpt({ msg, meta, level: 'trace' }),
     simple: (...args: unknown[]) => console.log(...args),
   };
 };

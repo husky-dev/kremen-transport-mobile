@@ -10,7 +10,7 @@ export const initSentry = () =>
     environment: config.env,
     release: `${config.sentry.project}@${config.version}`,
     tracesSampleRate: 1.0,
-    beforeSend: async event => (config.env === 'production' ? event : null),
+    beforeSend: async event => (config.env === 'prd' ? event : null),
   });
 
 export const captureSentryMessage = (msg: string, level: Severity, meta?: UnknownDict) => {
