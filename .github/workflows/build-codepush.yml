@@ -3,7 +3,7 @@ name: Build CodePush
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - 'v*.*.*-cp'
 
 jobs:
   build:
