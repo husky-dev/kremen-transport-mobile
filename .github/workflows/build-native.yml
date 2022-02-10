@@ -3,23 +3,31 @@ name: Build Native
 on:
   push:
     tags:
-      - 'v*.*.*-nt'
+      - 'v*.*.*-nt-*'
 
 jobs:
   android:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: "Env: set package version"
-      run: >
-        echo "VERSION=$(cat package.json | grep version | head -1 | awk
-        -F: '{ print $2 }' | sed 's/[",\t ]//g')" >> $GITHUB_ENV
-    - name: "Env: setup environment"
+    - name: "Env: setup DEV environment"
+      if: ${{ startsWith(github.ref, 'refs/tags') && endsWith(github.ref, '-dev') }}
       env:
         ENVFILE: ${{secrets.ENVFILE_DEV}}
+      run: echo "$ENV_FILE" > .env
+    - name: "Env: setup PRD environment"
+      if: ${{ startsWith(github.ref, 'refs/tags') && endsWith(github.ref, '-prd') }}
+      env:
+        ENV_FILE: ${{secrets.ENVFILE_PRD}}
+      run: echo "$ENV_FILE" > .env
+    - name: "Env: output .env file to env"
+      run: cat .env >> $GITHUB_ENV
+    - name: "Env: setup mobile properties"
       run: |
-        echo "$ENVFILE" > .env
-        cat .env >> $GITHUB_ENV
+        ./scripts/set_envs.py \
+          --google-map-key=$GOOGLE_MAPS_KEY \
+          --codepush-deployment-key-ios=$CODEPUSH_DEPLOYMENT_KEY_IOS \
+          --codepush-deployment-key-android=$CODEPUSH_DEPLOYMENT_KEY_ANDROID
     - name: "Env: setup gradle properties"
       env:
         ANDROID_GRADLE_PROPERTIES: ${{secrets.ANDROID_GRADLE_PROPERTIES}}
@@ -29,8 +37,7 @@ jobs:
         ANDROID_KEYSTORE_FILE: ${{secrets.ANDROID_KEYSTORE_FILE}}
       run: echo $ANDROID_KEYSTORE_FILE | base64 -di > ./android/app/production.keystore
     - name: 'Yarn: install'
-      run: |
-        yarn install
+      run: yarn install
     - name: 'Make: vsersion-sync'
       run: make version-sync
     - name: 'Make: build-android'
