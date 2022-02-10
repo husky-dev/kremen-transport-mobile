@@ -18,14 +18,16 @@ jobs:
       if: ${{ startsWith(github.ref, 'refs/tags') && endsWith(github.ref, '-dev') }}
       env:
         ENVFILE: ${{secrets.ENVFILE_DEV}}
-      run: echo "$ENV_FILE" > .env
+      run: |
+        echo "$ENVFILE" > .env
+        cat .env >> $GITHUB_ENV
     - name: "Env: setup PRD environment"
       if: ${{ startsWith(github.ref, 'refs/tags') && endsWith(github.ref, '-prd') }}
       env:
         ENV_FILE: ${{secrets.ENVFILE_PRD}}
-      run: echo "$ENV_FILE" > .env
-    - name: "Env: output .env file to env"
-      run: cat .env >> $GITHUB_ENV
+      run: |
+        echo "$ENVFILE" > .env
+        cat .env >> $GITHUB_ENV
     - name: 'Yarn: install'
       run: yarn install
     - name: 'CodePush: deploy iOS app'
