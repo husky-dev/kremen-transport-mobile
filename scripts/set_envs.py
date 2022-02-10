@@ -10,6 +10,7 @@ def main():
       android.set_google_maps_key(key)
     if arg.startswith("--codepush-deployment-key="):
       key = arg[len("--codepush-deployment-key="):]
+      ios.set_codepush_deployment_key(key)
       android.set_codepush_deployment_key(key)
 
 if __name__ == "__main__":
