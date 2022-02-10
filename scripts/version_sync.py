@@ -4,11 +4,11 @@ import sys
 import json
 import plistlib
 import re
-from unicodedata import numeric
+from typing import Tuple
 
 # Types
 
-Version = tuple[int, int, int]
+Version = Tuple[int, int, int]
 
 # Utils
 

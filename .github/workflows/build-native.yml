@@ -1,0 +1,48 @@
+name: Build Native
+
+on:
+  push:
+    tags:
+      - 'v*.*.*-nt'
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: "Env: set package version"
+      run: >
+        echo "VERSION=$(cat package.json | grep version | head -1 | awk
+        -F: '{ print $2 }' | sed 's/[",\t ]//g')" >> $GITHUB_ENV
+    - name: "Env: setup environment"
+      env:
+        ENVFILE: ${{secrets.ENVFILE_DEV}}
+      run: |
+        echo "$ENVFILE" > .env
+        cat .env >> $GITHUB_ENV
+    - name: "Env: setup gradle properties"
+      env:
+        ANDROID_GRADLE_PROPERTIES: ${{secrets.ANDROID_GRADLE_PROPERTIES}}
+      run: echo "$ANDROID_GRADLE_PROPERTIES" >> ./android/gradle.properties
+    - name: "Env: setup keystore file"
+      env:
+        ANDROID_KEYSTORE_FILE: ${{secrets.ANDROID_KEYSTORE_FILE}}
+      run: echo $ANDROID_KEYSTORE_FILE | base64 -di > ./android/app/production.keystore
+    - name: 'Yarn: install'
+      run: |
+        yarn install
+    - name: 'Make: vsersion-sync'
+      run: make version-sync
+    - name: 'Make: build-android'
+      run: make build-android
+    - name: 'Google Play: upload release'
+      uses: r0adkll/upload-google-play@v1
+      with:
+        serviceAccountJsonPlainText: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        packageName: com.krementransport
+        releaseFiles: android/app/build/outputs/bundle/release/*.aab
+        whatsNewDirectory: whatsnew
+        track: internal
+        inAppUpdatePriority: 0
+        status: completed
+        releaseName: ${{ env.VERSION }}

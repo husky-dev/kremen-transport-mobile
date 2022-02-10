@@ -1,9 +1,9 @@
-name: Build
+name: Build CodePush
 
 on:
   push:
     tags:
-      - '*'
+      - 'v*.*.*'
 
 jobs:
   build:
@@ -12,7 +12,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: "Env: set package version"
       run: >
-        echo "APP_VERSION=$(cat package.json | grep version | head -1 | awk
+        echo "VERSION=$(cat package.json | grep version | head -1 | awk
         -F: '{ print $2 }' | sed 's/[",\t ]//g')" >> $GITHUB_ENV
     - name: "Env: setup environment"
       env:
