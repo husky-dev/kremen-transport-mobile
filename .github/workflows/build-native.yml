@@ -46,8 +46,8 @@ jobs:
       run: yarn install
     - name: 'Make: vsersion-sync'
       run: make version-sync
-    - name: 'Make: build-android'
-      run: make build-android
+    - name: 'Make: android-build'
+      run: make android-build
     - name: 'Google Play: upload release'
       uses: r0adkll/upload-google-play@v1
       with:

@@ -1,5 +1,5 @@
 version-sync:
 	./scripts/version_sync.py
 
-build-android:
+android-build:
 	cd android && ./gradlew bundleRelease
