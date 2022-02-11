@@ -1,7 +1,7 @@
 import { TransportType } from '@core/api';
 import { ViewStyleProps } from '@styles';
 import React, { FC } from 'react';
-import Svg, { G, Path } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 
 interface Props extends ViewStyleProps {
   size?: number;

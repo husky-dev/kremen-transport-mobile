@@ -31,7 +31,6 @@ const maxLatDelta = 110;
 const defLongitudeDelta = defLatitudeDelta * getScreenAspectRatio();
 
 const mapMarkerSize = 46;
-const stationMarkerSize = Math.round(mapMarkerSize / 2.7);
 
 const selectedRoutesIdsStorage = getStorageParam('selectedRouteIds', isNumArrOrUndef);
 
@@ -157,7 +156,6 @@ export const MapScreen: FC<Props> = ({ style }) => {
               key={`station-${item.rid}-${item.sid}`}
               item={item}
               zIndex={10}
-              size={stationMarkerSize}
               onPress={() => handleStationMarkerPress(item)}
             />
           ))}
