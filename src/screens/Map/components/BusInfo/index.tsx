@@ -5,19 +5,20 @@ import { HStack, Text, VStack } from 'native-base';
 import React, { FC } from 'react';
 
 interface Props {
-  item: TransportBus;
+  item?: TransportBus;
   route?: TransportRoute;
 }
 
 export const MapBusInfo: FC<Props> = ({ item, route }) => {
   const getTitle = () => {
+    if (!item) return '---';
     const parts: string[] = [item.name];
     if (route) parts.push(`(маршрут: ${clearRouteNumber(route.number)})`);
     return parts.join(' ');
   };
   return (
     <HStack w="100%" space={3} alignItems="center">
-      <TransportBusRoundedIcon type={item.type} backgroundColor={route?.color} />
+      <TransportBusRoundedIcon type={item?.type} backgroundColor={route?.color} />
       <VStack>
         <Text
           _dark={{

@@ -9,7 +9,7 @@ import { getStorageParam, useStorage } from '@core/storage';
 import { getScreenAspectRatio, ViewStyleProps } from '@styles';
 import { isNumArrOrUndef, latLngToLatitudeLongitude } from '@utils';
 import { Actionsheet } from 'native-base';
-import React, { FC, useRef, useState } from 'react';
+import React, { FC, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import MapView, { Region } from 'react-native-maps';
 import { EdgeInsets, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -87,6 +87,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
 
   const renderBusMarker = (item: TransportBus) => {
     const colors = routeIdToColor(item.rid, routes);
+    const route = routes.find(itm => itm.rid === item.rid);
     let opacity = 1.0;
     let zIndex = 20;
     if (selectedBus) {
@@ -100,6 +101,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
       <BusMarker
         key={`bus-${item.tid}`}
         item={item}
+        route={route}
         colors={colors}
         size={mapMarkerSize}
         zIndex={zIndex}
@@ -186,7 +188,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
       </Actionsheet>
       <Actionsheet isOpen={!!selectedBus} onClose={() => setSelectedBus(undefined)}>
         <Actionsheet.Content pl={8} pr={8}>
-          {!!selectedBus && <MapBusInfo item={selectedBus} route={routes.find(itm => itm.rid === selectedBus.rid)} />}
+          <MapBusInfo item={selectedBus} route={routes.find(itm => itm.rid === selectedBus?.rid)} />
         </Actionsheet.Content>
       </Actionsheet>
     </>

@@ -45,7 +45,7 @@ const getApi = () => {
 
   return {
     transport: {
-      routes: async (): Promise<TransportRoute[]> => apiReq<TransportRoute[]>({ path: `transport/routes` }),
+      routes: async (): Promise<TransportRoute[]> => apiReq<TransportRoute[]>({ path: `transport/routes?v=2` }),
       buses: async (): Promise<TransportBus[]> => apiReq<TransportBus[]>({ path: `transport/buses` }),
       busesLocations: async () => apiReq<TransportBusesLocations>({ path: `transport/buses/locations` }),
       stationPrediction: async (sid: number): Promise<TransportPrediction[]> =>

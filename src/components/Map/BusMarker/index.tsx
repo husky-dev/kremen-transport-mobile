@@ -1,4 +1,5 @@
-import { offlineColors, TransportBus, TransportType } from '@core/api';
+import { offlineColors, TransportBus, TransportRoute, TransportType } from '@core/api';
+import { clearRouteNumber, clearRouteNumberTransportInfo } from '@core/utils';
 import { ColorsSet } from '@styles';
 import React, { FC } from 'react';
 import { MapEvent, Marker } from 'react-native-maps';
@@ -6,6 +7,7 @@ import Svg, { G, Path } from 'react-native-svg';
 
 interface Props {
   item: TransportBus;
+  route?: TransportRoute;
   colors: ColorsSet;
   zIndex?: number;
   opacity?: number;
@@ -45,9 +47,22 @@ const getIconCodeForBus = (bus: TransportBus, colors: ColorsSet, size: number) =
   );
 };
 
-export const BusMarker: FC<Props> = ({ item, colors, zIndex = 20, size = 38, opacity = 1.0, onPress }) => {
+const getBusPinUrl = (bus: TransportBus, route: TransportRoute | undefined, colors: ColorsSet) => {
+  const number = route ? clearRouteNumberTransportInfo(route.number) : '-';
+  const parts: string[] = [
+    'd=3',
+    `direction=${bus.direction}`,
+    `number=${number}`,
+    `light=${colors.light.replace('#', '%23')}`,
+    `dark=${encodeURI(colors.dark.replace('#', '%23'))}`,
+    `type=${bus.type === TransportType.Bus ? 'bus' : 'trolleybus'}`,
+    `v=1`,
+  ];
+  return `https://api.kremen.dev/img/transport/bus/pin?${parts.join('&')}`;
+};
+
+export const BusMarker: FC<Props> = ({ item, colors, zIndex = 20, route, opacity = 1.0, onPress }) => {
   const handlePress = (event: MapEvent<{ action: 'marker-press'; id: string }>) => {
-    event.preventDefault();
     event.stopPropagation();
     onPress && onPress();
   };
@@ -60,9 +75,12 @@ export const BusMarker: FC<Props> = ({ item, colors, zIndex = 20, size = 38, opa
       anchor={{ x: 0.5, y: 0.8 }}
       opacity={opacity}
       zIndex={zIndex}
-    >
-      {getIconCodeForBus(item, item.offline ? offlineColors : colors, size)}
-    </Marker>
+      icon={{
+        uri: getBusPinUrl(item, route, item.offline ? offlineColors : colors),
+        width: 58,
+        height: 46,
+      }}
+    />
   );
 };
 
