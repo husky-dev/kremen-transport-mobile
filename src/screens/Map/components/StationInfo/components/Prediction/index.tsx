@@ -16,8 +16,8 @@ export const StationInfoPrediction: FC<Props> = ({ style, item, route }) => {
   const { numStr, metric } = numToTimeStr(item.prediction);
   return (
     <VStack style={[styles.container, style]} space={1} alignItems="center">
-      <HStack background={route.color} pl="6px" pr="6px" borderRadius={4} alignItems="center" justifyContent="space-between">
-        <TransportBusIcon size={14} type={route.type} />
+      <HStack background={route.color} pl="4px" pr="6px" borderRadius={4} alignItems="center" justifyContent="space-between">
+        <TransportBusIcon size={20} type={route.type} />
         <Text textAlign="center" fontSize="sm" ml="2px" bold>
           {clearRouteNumberTransportInfo(route.number).replace('-', '').toLowerCase()}
         </Text>

@@ -8,7 +8,7 @@ import trolleybusIcon from './assets/trolleybus.png';
 
 interface Props extends ViewStyleProps {
   size?: number;
-  type: TransportType;
+  type?: TransportType;
   backgroundColor?: string;
 }
 
@@ -18,7 +18,7 @@ export const TransportBusRoundedIcon: FC<Props> = ({ style, type, size = 48, bac
       style={style}
       size={`${size}px`}
       backgroundColor={backgroundColor}
-      source={type === TransportType.Trolleybus ? trolleybusIcon : busIcon}
+      source={type ? (type === TransportType.Trolleybus ? trolleybusIcon : busIcon) : undefined}
     />
   );
 };

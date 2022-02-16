@@ -5,25 +5,34 @@ import MapScreen from '@screens/Map';
 import * as Sentry from '@sentry/react-native';
 import { colors } from '@styles';
 import { extendTheme, NativeBaseProvider } from 'native-base';
-import React, { PureComponent } from 'react';
+import React, { PureComponent, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import codePush, { DownloadProgress } from 'react-native-code-push';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-const log = Log('app');
+const cplog = Log('codepush');
 
 Sentry.init({
   dsn: config.sentry.dsn,
   tracesSampleRate: 1.0,
+  beforeSend: event => (config.env !== 'prd' ? null : event),
 });
 
 export const App = () => {
+  useEffect(() => {
+    (async () => {
+      const cur = await codePush.getUpdateMetadata();
+      cplog.debug('codepush current update', { cur });
+      const avail = await codePush.checkForUpdate();
+      cplog.debug('codepush available update', { avail });
+    })();
+  }, []);
   const theme = extendTheme({
     colors: {
       primary: colors.primary,
     },
     config: {
-      initialColorMode: 'dark', // Changing initialColorMode to 'dark'
+      initialColorMode: 'dark',
     },
   });
   return (
@@ -45,20 +54,20 @@ class AppWithCodePush extends PureComponent {
   codePushStatusDidChange(status: codePush.SyncStatus) {
     switch (status) {
       case codePush.SyncStatus.CHECKING_FOR_UPDATE:
-        return log.debug('checking for updates');
+        return cplog.info('checking for updates');
       case codePush.SyncStatus.DOWNLOADING_PACKAGE:
-        return log.info('downloading package');
+        return cplog.info('downloading package');
       case codePush.SyncStatus.INSTALLING_UPDATE:
-        return log.info('installing update');
+        return cplog.info('installing update');
       case codePush.SyncStatus.UP_TO_DATE:
-        return log.debug('up-to-date');
+        return cplog.info('up-to-date');
       case codePush.SyncStatus.UPDATE_INSTALLED:
-        return log.info('update installed');
+        return cplog.info('update installed');
     }
   }
 
   codePushDownloadDidProgress(progress: DownloadProgress) {
-    log.debug('download progress', { total: progress.totalBytes, received: progress.receivedBytes });
+    cplog.debug('download progress', { total: progress.totalBytes, received: progress.receivedBytes });
   }
 
   render() {
@@ -66,4 +75,8 @@ class AppWithCodePush extends PureComponent {
   }
 }
 
-export default Sentry.wrap(codePush(AppWithCodePush));
+export default Sentry.wrap(
+  codePush({
+    checkFrequency: codePush.CheckFrequency.ON_APP_START,
+  })(AppWithCodePush),
+);

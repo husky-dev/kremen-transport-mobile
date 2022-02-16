@@ -1,6 +1,7 @@
 import { colors, colorSetFromColor } from '@styles';
 import { isArr, isNum, isStr, isUndef, isUnknownDict } from '@utils';
-import { TransportBus, TransportRoute } from '.';
+
+import { TransportBus, TransportRoute, TransportType } from '.';
 
 export interface ApiReqOpt {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -58,3 +59,41 @@ export const isTransportBusArr = (val: unknown): val is TransportBus[] =>
 
 export const isTransportBusArrOrUndef = (val: unknown): val is TransportBus[] | undefined =>
   isTransportBusArr(val) || isUndef(val);
+
+export interface TransportBusPinIcon {
+  version?: number;
+  density?: number;
+  light: string;
+  dark: string;
+  direction: number;
+  number: string;
+  type: TransportType;
+  theme?: 'light' | 'dark';
+}
+
+export const getTransportBusPinUri = (icon: TransportBusPinIcon): string => {
+  const { version = 1, direction, type, number, light, dark, density = 3, theme = 'light' } = icon;
+  const parts: string[] = [
+    `d=${density}`,
+    `direction=${direction}`,
+    `number=${encodeURIComponent(number)}`,
+    `light=${encodeURIComponent(light)}`,
+    `dark=${encodeURIComponent(dark)}`,
+    `type=${type === TransportType.Bus ? 'bus' : 'trolleybus'}`,
+    `theme=${theme}`,
+    `v=${version}`,
+  ];
+  return `https://api.kremen.dev/img/transport/bus/pin?${parts.join('&')}`;
+};
+
+export interface TransportStationPinIcon {
+  version?: number;
+  density?: number;
+  theme?: 'light' | 'dark';
+}
+
+export const getTransportStationPinUri = (icon: TransportStationPinIcon): string => {
+  const { version = 1, density = 3, theme = 'light' } = icon;
+  const parts: string[] = [`d=${density}`, `theme=${theme}`, `v=${version}`];
+  return `https://api.kremen.dev/img/transport/station/pin?${parts.join('&')}`;
+};

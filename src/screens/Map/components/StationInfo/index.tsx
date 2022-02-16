@@ -1,11 +1,11 @@
-import { TransportStationIcon } from '@components/Transport';
-import { api, TransportPrediction, TransportStation } from '@core/api';
+import { api, getTransportStationPinUri, TransportPrediction, TransportStation } from '@core/api';
 import { Log } from '@core/log';
 import { useStorage } from '@core/storage';
 import { ViewStyleProps } from '@styles';
 import { compact } from '@utils';
 import { HStack, ScrollView, Spinner, Text, VStack } from 'native-base';
 import React, { FC, useEffect, useState } from 'react';
+import { Image } from 'react-native';
 
 import StationInfoPrediction from './components/Prediction';
 
@@ -56,7 +56,7 @@ export const MapStationInfo: FC<Props> = ({ style, item }) => {
 
   return (
     <HStack style={style} w="100%" space={3} pl="16px" pr="16px">
-      <TransportStationIcon size={48} />
+      <Image style={{ width: 48, height: 48 }} source={{ uri: getTransportStationPinUri({ density: 5 }) }} />
       <VStack mt="-5px">
         <Text
           _dark={{

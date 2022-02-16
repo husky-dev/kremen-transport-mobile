@@ -6,9 +6,9 @@ import { coordinates } from '@core/consts';
 import { defSelectedRouteIds } from '@core/data';
 import { Log } from '@core/log';
 import { getStorageParam, useStorage } from '@core/storage';
-import { getScreenAspectRatio, ViewStyleProps } from '@styles';
+import { getScreenAspectRatio, mapCustomStyle, mapDarkStyle, ViewStyleProps } from '@styles';
 import { isNumArrOrUndef, latLngToLatitudeLongitude } from '@utils';
-import { Actionsheet } from 'native-base';
+import { Actionsheet, useColorMode } from 'native-base';
 import React, { FC, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import MapView, { Region } from 'react-native-maps';
@@ -30,8 +30,6 @@ const minLatDelta = 0.00156;
 const maxLatDelta = 110;
 const defLongitudeDelta = defLatitudeDelta * getScreenAspectRatio();
 
-const mapMarkerSize = 46;
-
 const selectedRoutesIdsStorage = getStorageParam('selectedRouteIds', isNumArrOrUndef);
 
 export const MapScreen: FC<Props> = ({ style }) => {
@@ -44,6 +42,8 @@ export const MapScreen: FC<Props> = ({ style }) => {
   const [routesModalOpen, setRoutesModalOpen] = useState<boolean>(false);
 
   const mapRef = useRef<MapView>(null);
+
+  const { colorMode: theme } = useColorMode();
 
   const handleMapPress = () => {
     log.debug('handle map press');
@@ -87,6 +87,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
 
   const renderBusMarker = (item: TransportBus) => {
     const colors = routeIdToColor(item.rid, routes);
+    const route = routes.find(itm => itm.rid === item.rid);
     let opacity = 1.0;
     let zIndex = 20;
     if (selectedBus) {
@@ -100,10 +101,11 @@ export const MapScreen: FC<Props> = ({ style }) => {
       <BusMarker
         key={`bus-${item.tid}`}
         item={item}
+        route={route}
         colors={colors}
-        size={mapMarkerSize}
         zIndex={zIndex}
         opacity={opacity}
+        theme={theme}
         onPress={() => handleBusMarkerPress(item)}
       />
     );
@@ -132,6 +134,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
   const selectedStation = selectedStationId ? displayedStations.find(itm => itm.sid === selectedStationId) : undefined;
 
   const styles = getStyles(useSafeAreaInsets());
+  const mapStyle = theme === 'dark' ? [...mapDarkStyle, ...mapCustomStyle] : mapCustomStyle;
 
   return (
     <>
@@ -144,6 +147,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
             latitudeDelta: defLatitudeDelta,
             longitudeDelta: defLongitudeDelta,
           }}
+          customMapStyle={mapStyle}
           loadingEnabled
           rotateEnabled={false}
           pitchEnabled={false}
@@ -156,6 +160,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
               key={`station-${item.rid}-${item.sid}`}
               item={item}
               zIndex={10}
+              theme={theme}
               onPress={() => handleStationMarkerPress(item)}
             />
           ))}
@@ -186,7 +191,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
       </Actionsheet>
       <Actionsheet isOpen={!!selectedBus} onClose={() => setSelectedBus(undefined)}>
         <Actionsheet.Content pl={8} pr={8}>
-          {!!selectedBus && <MapBusInfo item={selectedBus} route={routes.find(itm => itm.rid === selectedBus.rid)} />}
+          <MapBusInfo item={selectedBus} route={routes.find(itm => itm.rid === selectedBus?.rid)} />
         </Actionsheet.Content>
       </Actionsheet>
     </>
