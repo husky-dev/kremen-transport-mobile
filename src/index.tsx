@@ -6,7 +6,7 @@ import MapScreen from '@screens/Map';
 import * as Sentry from '@sentry/react-native';
 import { colors } from '@styles';
 import { extendTheme, NativeBaseProvider } from 'native-base';
-import React, { PureComponent, useEffect } from 'react';
+import React, { PureComponent } from 'react';
 import { StyleSheet } from 'react-native';
 import codePush, { DownloadProgress } from 'react-native-code-push';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -20,21 +20,6 @@ Sentry.init({
 });
 
 const App = () => {
-  // useEffect(() => {
-  //   codePush.sync();
-  // }, []);
-  // useEffect(() => {
-  //   (async () => {
-  //     try {
-  //       await codePush.sync({
-  //         installMode: codePush.InstallMode.ON_NEXT_RESUME,
-  //         mandatoryInstallMode: codePush.InstallMode.IMMEDIATE,
-  //       });
-  //     } catch (err: unknown) {
-  //       cplog.err('codepush sync err', { msg: errToStr(err) });
-  //     }
-  //   })();
-  // }, []);
   const theme = extendTheme({
     colors: {
       primary: colors.primary,
@@ -85,6 +70,8 @@ class AppWithCodePush extends PureComponent {
   }
 }
 
-export default codePush({
-  checkFrequency: codePush.CheckFrequency.ON_APP_RESUME,
-})(Sentry.wrap(AppWithCodePush));
+export default Sentry.wrap(
+  codePush({
+    checkFrequency: codePush.CheckFrequency.ON_APP_RESUME,
+  })(AppWithCodePush),
+);
