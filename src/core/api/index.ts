@@ -30,7 +30,7 @@ const getApi = () => {
     try {
       log.debug('req', { url, opt: reqInit });
       const resp = await fetch(url, reqInit);
-      log.debug('req done', { url, opt: reqInit });
+      // log.debug('req done', { url, opt: reqInit });
       if (!resp.ok) {
         throw new ApiError(resp.statusText, resp.status);
       }

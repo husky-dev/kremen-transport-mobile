@@ -81,7 +81,7 @@ export const StorageProvider: FC = ({ children }) => {
     try {
       log.debug('updating data');
       const [routes, buses] = await Promise.all([api.transport.routes(), api.transport.buses()]);
-      log.debug('updating data done', { routes, buses });
+      log.debug('updating data done');
       setAndSaveRoutes(routes);
       setAndSaveBuses(buses);
     } catch (err: unknown) {

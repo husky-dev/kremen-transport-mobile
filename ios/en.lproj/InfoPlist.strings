@@ -7,4 +7,4 @@
 */
 "CFBundleDisplayName" = "Transport";
 "CFBundleName" = "Transport";
-"NSLocationWhenInUseUsageDescription" = "This is required to show your current location on the map.";
+"NSLocationWhenInUseUsageDescription" = "Your location is necessary for displaying it on the map and ease of use";

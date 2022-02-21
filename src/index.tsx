@@ -1,3 +1,4 @@
+import { LocationProvider } from '@core';
 import { config } from '@core/config';
 import { Log } from '@core/log';
 import { StorageProvider } from '@core/storage';
@@ -38,9 +39,11 @@ export const App = () => {
   return (
     <SafeAreaProvider>
       <StorageProvider>
-        <NativeBaseProvider theme={theme}>
-          <MapScreen style={styles.screen} />
-        </NativeBaseProvider>
+        <LocationProvider>
+          <NativeBaseProvider theme={theme}>
+            <MapScreen style={styles.screen} />
+          </NativeBaseProvider>
+        </LocationProvider>
       </StorageProvider>
     </SafeAreaProvider>
   );

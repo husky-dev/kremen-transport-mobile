@@ -1,5 +1,6 @@
 import { RoundedIconBtn } from '@components/Buttons';
-import { BusMarker, RoutePath, StationMarker } from '@components/Map';
+import { BusMarker, CurPositionMarker, RoutePath, StationMarker } from '@components/Map';
+import { useLocation } from '@core';
 import { defRoutePathColors, routeIdToColor, routeToColor, TransportStation } from '@core/api';
 import { TransportBus, TransportRoute } from '@core/api/types';
 import { config } from '@core/config';
@@ -8,10 +9,10 @@ import { defSelectedRouteIds } from '@core/data';
 import { Log } from '@core/log';
 import { getStorageParam, useStorage } from '@core/storage';
 import { getScreenAspectRatio, mapCustomStyle, mapDarkStyle, ViewStyleProps } from '@styles';
-import { isNumArrOrUndef, latLngToLatitudeLongitude } from '@utils';
+import { errToStr, isMapRegion, isNumArrOrUndef, latLngToLatitudeLongitude } from '@utils';
 import { Actionsheet, useColorMode } from 'native-base';
 import React, { FC, useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 import MapView, { Region } from 'react-native-maps';
 import { EdgeInsets, useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -31,10 +32,18 @@ const maxLatDelta = 110;
 const defLongitudeDelta = defLatitudeDelta * getScreenAspectRatio();
 
 const selectedRoutesIdsStorage = getStorageParam('selectedRouteIds', isNumArrOrUndef);
+const lastMapRegionStorage = getStorageParam('lastMapRegion', isMapRegion);
 
 export const MapScreen: FC<Props> = ({ style }) => {
   const { buses, routes } = useStorage();
-  const [region, setRegion] = useState<Region | undefined>();
+  const [region, setRegion] = useState<Region>({
+    ...latLngToLatitudeLongitude(coordinates.kremen),
+    latitudeDelta: defLatitudeDelta,
+    longitudeDelta: defLongitudeDelta,
+  });
+
+  const [configsLoaded, setConfigsLoaded] = useState<boolean>(false);
+  const [curPostitionLoaded, setCurPostitionLoaded] = useState<boolean>(false);
 
   const [selectedBus, setSelectedBus] = useState<TransportBus | undefined>(undefined);
   const [selectedStationId, setSelectedStationId] = useState<number | undefined>(undefined);
@@ -42,15 +51,30 @@ export const MapScreen: FC<Props> = ({ style }) => {
   const [routesModalOpen, setRoutesModalOpen] = useState<boolean>(false);
 
   const mapRef = useRef<MapView>(null);
-
+  const { hasLocationPermission, curPosition } = useLocation();
   const { colorMode: theme } = useColorMode();
 
   useEffect(() => {
     (async () => {
-      const storedSelectedRoutesIds = await selectedRoutesIdsStorage.get();
-      if (storedSelectedRoutesIds) setSelectedRoutesIds(storedSelectedRoutesIds);
+      try {
+        const storedSelectedRoutesIds = await selectedRoutesIdsStorage.get();
+        if (storedSelectedRoutesIds) setSelectedRoutesIds(storedSelectedRoutesIds);
+        const lastMapRegion = await lastMapRegionStorage.get();
+        if (lastMapRegion) setRegion(lastMapRegion);
+      } catch (err: unknown) {
+        log.err('loading configs err', { msg: errToStr(err) });
+      } finally {
+        setConfigsLoaded(true);
+      }
     })();
   }, []);
+
+  useEffect(() => {
+    if (!curPosition || curPostitionLoaded || !mapRef.current) return;
+    const { lat, lng } = curPosition;
+    mapRef.current.animateToRegion({ ...region, latitude: lat, longitude: lng });
+    setCurPostitionLoaded(true);
+  }, [curPosition]);
 
   // Map
 
@@ -61,12 +85,14 @@ export const MapScreen: FC<Props> = ({ style }) => {
   };
 
   const handleRegionChange = (region: Region) => {
+    log.debug('region change', { ...region });
     setRegion(region);
+    lastMapRegionStorage.set(region);
   };
 
   const handleZoomInPress = async () => {
     log.debug('handle zoom in press');
-    if (!mapRef.current || !region) return;
+    if (!mapRef.current) return;
     let newLatDelta = region.latitudeDelta * latDeltaStep;
     if (newLatDelta < minLatDelta) newLatDelta = minLatDelta;
     const newLngDelta = newLatDelta * getScreenAspectRatio();
@@ -75,7 +101,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
 
   const handleZoomOutPress = () => {
     log.debug('handle zoom out press');
-    if (!mapRef.current || !region) return;
+    if (!mapRef.current) return;
     let newLatDelta = region.latitudeDelta / latDeltaStep;
     if (newLatDelta > maxLatDelta) newLatDelta = maxLatDelta;
     const newLngDelta = newLatDelta * getScreenAspectRatio();
@@ -85,17 +111,26 @@ export const MapScreen: FC<Props> = ({ style }) => {
   const handleBusMarkerPress = (item: TransportBus) => {
     log.debug('handle bus marker press', { item });
     setSelectedBus(item);
-    // if (mapRef.current && region) {
-    //   mapRef.current.animateToRegion({ ...region, latitude: item.lat, longitude: item.lng });
-    // }
+    if (mapRef.current) {
+      mapRef.current.animateToRegion({ ...region, latitude: item.lat, longitude: item.lng });
+    }
   };
 
   const handleStationMarkerPress = (item: TransportStation) => {
     log.debug('handle station marker press', { item });
-    // if (mapRef.current && region) {
-    //   mapRef.current.animateToRegion({ ...region, latitude: item.lat, longitude: item.lng });
-    // }
     setSelectedStationId(item.sid);
+    if (mapRef.current) {
+      mapRef.current.animateToRegion({ ...region, latitude: item.lat, longitude: item.lng });
+    }
+  };
+
+  const handleCurPostionPress = () => {
+    if (!hasLocationPermission) {
+      return Alert.alert('Помилка', 'Ви повині надати доступ до вашого місцезнаходження для використання цієї функції');
+    }
+    if (!curPosition || !mapRef.current) return;
+    const { lat, lng } = curPosition;
+    mapRef.current.animateToRegion({ ...region, latitude: lat, longitude: lng });
   };
 
   // Routes
@@ -158,17 +193,15 @@ export const MapScreen: FC<Props> = ({ style }) => {
   const styles = getStyles(useSafeAreaInsets());
   const mapStyle = theme === 'dark' ? [...mapDarkStyle, ...mapCustomStyle] : mapCustomStyle;
 
+  if (!configsLoaded) return null;
+
   return (
     <>
       <View style={[styles.container, style]}>
         <MapView
           ref={mapRef}
           style={styles.map}
-          initialRegion={{
-            ...latLngToLatitudeLongitude(coordinates.kremen),
-            latitudeDelta: defLatitudeDelta,
-            longitudeDelta: defLongitudeDelta,
-          }}
+          initialRegion={region}
           customMapStyle={mapStyle}
           loadingEnabled
           rotateEnabled={false}
@@ -187,6 +220,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
             />
           ))}
           {displayedBuses.map(renderBusMarker)}
+          {hasLocationPermission && !!curPosition && <CurPositionMarker position={curPosition} />}
         </MapView>
         {/* <MapRoutesPanel
           style={styles.routesPanel}
@@ -198,7 +232,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
           <RoundedIconBtn style={styles.controlsPanelBtn} icon="bus" onPress={() => setRoutesModalOpen(true)} />
           <RoundedIconBtn style={styles.controlsPanelBtn} icon="plus" onPress={handleZoomInPress} />
           <RoundedIconBtn style={styles.controlsPanelBtn} icon="minus" onPress={handleZoomOutPress} />
-          <RoundedIconBtn style={styles.controlsPanelBtn} icon="location" />
+          <RoundedIconBtn style={styles.controlsPanelBtn} icon="location" onPress={handleCurPostionPress} />
         </View>
         {config.env === 'dev' && (
           <View style={styles.versionWrap}>
