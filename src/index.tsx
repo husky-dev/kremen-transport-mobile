@@ -5,6 +5,7 @@ import { StorageProvider } from '@core/storage';
 import MapScreen from '@screens/Map';
 import * as Sentry from '@sentry/react-native';
 import { colors } from '@styles';
+import { errToStr } from '@utils';
 import { extendTheme, NativeBaseProvider } from 'native-base';
 import React, { PureComponent, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
@@ -20,14 +21,18 @@ Sentry.init({
 });
 
 export const App = () => {
-  useEffect(() => {
-    (async () => {
-      const cur = await codePush.getUpdateMetadata();
-      cplog.debug('codepush current update', { cur });
-      const avail = await codePush.checkForUpdate();
-      cplog.debug('codepush available update', { avail });
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       await codePush.sync({
+  //         installMode: codePush.InstallMode.ON_NEXT_RESUME,
+  //         mandatoryInstallMode: codePush.InstallMode.IMMEDIATE,
+  //       });
+  //     } catch (err: unknown) {
+  //       cplog.err('codepush sync err', { msg: errToStr(err) });
+  //     }
+  //   })();
+  // }, []);
   const theme = extendTheme({
     colors: {
       primary: colors.primary,
@@ -78,8 +83,8 @@ class AppWithCodePush extends PureComponent {
   }
 }
 
-export default Sentry.wrap(
-  codePush({
-    checkFrequency: codePush.CheckFrequency.ON_APP_START,
-  })(AppWithCodePush),
-);
+export default codePush({
+  checkFrequency: codePush.CheckFrequency.ON_APP_RESUME,
+  installMode: codePush.InstallMode.ON_NEXT_RESUME,
+  mandatoryInstallMode: codePush.InstallMode.IMMEDIATE,
+})(Sentry.wrap(AppWithCodePush));
