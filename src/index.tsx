@@ -5,7 +5,6 @@ import { StorageProvider } from '@core/storage';
 import MapScreen from '@screens/Map';
 import * as Sentry from '@sentry/react-native';
 import { colors } from '@styles';
-import { errToStr } from '@utils';
 import { extendTheme, NativeBaseProvider } from 'native-base';
 import React, { PureComponent, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
@@ -21,6 +20,12 @@ Sentry.init({
 });
 
 export const App = () => {
+  useEffect(() => {
+    codePush.sync({
+      installMode: codePush.InstallMode.ON_NEXT_RESUME,
+      mandatoryInstallMode: codePush.InstallMode.IMMEDIATE,
+    });
+  }, []);
   // useEffect(() => {
   //   (async () => {
   //     try {
