@@ -19,13 +19,10 @@ Sentry.init({
   beforeSend: event => (config.env !== 'prd' ? null : event),
 });
 
-export const App = () => {
-  useEffect(() => {
-    codePush.sync({
-      installMode: codePush.InstallMode.ON_NEXT_RESUME,
-      mandatoryInstallMode: codePush.InstallMode.IMMEDIATE,
-    });
-  }, []);
+const App = () => {
+  // useEffect(() => {
+  //   codePush.sync();
+  // }, []);
   // useEffect(() => {
   //   (async () => {
   //     try {
@@ -90,6 +87,4 @@ class AppWithCodePush extends PureComponent {
 
 export default codePush({
   checkFrequency: codePush.CheckFrequency.ON_APP_RESUME,
-  installMode: codePush.InstallMode.ON_NEXT_RESUME,
-  mandatoryInstallMode: codePush.InstallMode.IMMEDIATE,
 })(Sentry.wrap(AppWithCodePush));
