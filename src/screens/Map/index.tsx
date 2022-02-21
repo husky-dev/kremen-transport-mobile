@@ -10,7 +10,7 @@ import { getStorageParam, useStorage } from '@core/storage';
 import { getScreenAspectRatio, mapCustomStyle, mapDarkStyle, ViewStyleProps } from '@styles';
 import { isNumArrOrUndef, latLngToLatitudeLongitude } from '@utils';
 import { Actionsheet, useColorMode } from 'native-base';
-import React, { FC, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import MapView, { Region } from 'react-native-maps';
 import { EdgeInsets, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -44,6 +44,15 @@ export const MapScreen: FC<Props> = ({ style }) => {
   const mapRef = useRef<MapView>(null);
 
   const { colorMode: theme } = useColorMode();
+
+  useEffect(() => {
+    (async () => {
+      const storedSelectedRoutesIds = await selectedRoutesIdsStorage.get();
+      if (storedSelectedRoutesIds) setSelectedRoutesIds(storedSelectedRoutesIds);
+    })();
+  }, []);
+
+  // Map
 
   const handleMapPress = () => {
     log.debug('handle map press');
@@ -84,6 +93,15 @@ export const MapScreen: FC<Props> = ({ style }) => {
     // }
     setSelectedStationId(item.sid);
   };
+
+  // Routes
+
+  const handleSelectedRoutesChange = (ids: number[]) => {
+    setSelectedRoutesIds(ids);
+    selectedRoutesIdsStorage.set(ids);
+  };
+
+  // Render
 
   const renderBusMarker = (item: TransportBus) => {
     const colors = routeIdToColor(item.rid, routes);
@@ -188,7 +206,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
         open={routesModalOpen}
         routes={routes}
         selected={selectedRoutesIds}
-        onSelectedChange={val => setSelectedRoutesIds(val)}
+        onSelectedChange={handleSelectedRoutesChange}
         onClose={() => setRoutesModalOpen(false)}
       />
       <Actionsheet isOpen={!!selectedStationId} onClose={() => setSelectedStationId(undefined)}>
