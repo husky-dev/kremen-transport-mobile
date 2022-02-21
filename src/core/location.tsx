@@ -69,6 +69,15 @@ export const LocationProvider: FC = ({ children }) => {
         log.err('getting cur position err', { ...err });
       },
     );
+    const watchId = Geolocation.watchPosition(
+      (val: GeoPosition) => {
+        log.debug('new cur position', { ...val });
+      },
+      (err: GeoError) => {
+        log.err('watching cur position err', { ...err });
+      },
+    );
+    return () => Geolocation.clearWatch(watchId);
   }, [hasLocationPermission]);
 
   const value = useMemo(() => ({ hasLocationPermission, curPosition }), [hasLocationPermission, curPosition]);
