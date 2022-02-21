@@ -60,6 +60,10 @@ export const MapScreen: FC<Props> = ({ style }) => {
     setSelectedStationId(undefined);
   };
 
+  const handleRegionChange = (region: Region) => {
+    setRegion(region);
+  };
+
   const handleZoomInPress = async () => {
     log.debug('handle zoom in press');
     if (!mapRef.current || !region) return;
@@ -170,7 +174,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
           rotateEnabled={false}
           pitchEnabled={false}
           onPress={handleMapPress}
-          onRegionChange={newRegion => setRegion(newRegion)}
+          onRegionChange={handleRegionChange}
         >
           {displayedRoutes.map(renderRoutePath)}
           {displayedStations.map(item => (
