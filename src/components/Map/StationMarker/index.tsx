@@ -1,6 +1,7 @@
 import { getTransportStationPinUri, TransportStation } from '@core/api';
 import { ColorMode } from 'native-base';
 import React, { FC } from 'react';
+import { Image } from 'react-native';
 import { MapEvent, Marker } from 'react-native-maps';
 
 interface Props {
@@ -20,11 +21,14 @@ export const StationMarker: FC<Props> = ({ item, zIndex = 10, opacity = 1.0, the
   const iconUri = getTransportStationPinUri({ theme: theme ? theme : undefined });
   return (
     <Marker
+      style={{ zIndex, width: 20, height: 20 }}
       coordinate={{ latitude: lat, longitude: lng }}
-      zIndex={zIndex}
       opacity={opacity}
       onPress={handlePress}
-      icon={{ uri: iconUri, width: 20, height: 20 }}
+      anchor={{ x: 0.5, y: 0.5 }}
+      stopPropagation
+      zIndex={zIndex}
+      image={{ uri: iconUri }}
     />
   );
 };

@@ -3,6 +3,7 @@ import { clearRouteNumberTransportInfo } from '@core/utils';
 import { ColorsSet } from '@styles';
 import { ColorMode } from 'native-base';
 import React, { FC } from 'react';
+import { Image } from 'react-native';
 import { MapEvent, Marker } from 'react-native-maps';
 
 interface Props {
@@ -25,16 +26,16 @@ export const BusMarker: FC<Props> = ({ item, colors, zIndex = 20, route, theme, 
   const number = route ? clearRouteNumberTransportInfo(route.number) : '-';
   const { light, dark } = item.offline ? offlineColors : colors;
   const iconUri = getTransportBusPinUri({ direction, number, light, dark, type, theme: theme ? theme : undefined });
-
   return (
     <Marker
-      onPress={handlePress}
+      style={{ zIndex, width: 58, height: 46 }}
       coordinate={{ latitude: item.lat, longitude: item.lng }}
       tracksViewChanges={false}
-      anchor={{ x: 0.5, y: 0.8 }}
+      anchor={{ x: 0.5, y: 0.5 }}
       opacity={opacity}
-      zIndex={zIndex}
-      icon={{ uri: iconUri, width: 58, height: 46 }}
+      image={{ uri: iconUri }}
+      stopPropagation
+      onPress={handlePress}
     />
   );
 };

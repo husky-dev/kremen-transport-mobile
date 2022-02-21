@@ -9,6 +9,7 @@ export interface ApiReqOpt {
   data?: unknown;
   params?: ApiReqOptParams;
   timeout?: number;
+  retry?: number;
 }
 
 export type ApiReqOptParams = Record<string, string | number | boolean | undefined>;

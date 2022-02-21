@@ -2,6 +2,7 @@ import { RoundedIconBtn } from '@components/Buttons';
 import { BusMarker, RoutePath, StationMarker } from '@components/Map';
 import { defRoutePathColors, routeIdToColor, routeToColor, TransportStation } from '@core/api';
 import { TransportBus, TransportRoute } from '@core/api/types';
+import { config } from '@core/config';
 import { coordinates } from '@core/consts';
 import { defSelectedRouteIds } from '@core/data';
 import { Log } from '@core/log';
@@ -10,13 +11,12 @@ import { getScreenAspectRatio, mapCustomStyle, mapDarkStyle, ViewStyleProps } fr
 import { isNumArrOrUndef, latLngToLatitudeLongitude } from '@utils';
 import { Actionsheet, useColorMode } from 'native-base';
 import React, { FC, useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import MapView, { Region } from 'react-native-maps';
 import { EdgeInsets, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import MapBusInfo from './components/BusInfo';
 import MapRoutesModal from './components/RotuesModal';
-import MapRoutesPanel from './components/RoutesPanel';
 import MapStationInfo from './components/StationInfo';
 import { routesToStatiosn } from './utils';
 
@@ -166,18 +166,23 @@ export const MapScreen: FC<Props> = ({ style }) => {
           ))}
           {displayedBuses.map(renderBusMarker)}
         </MapView>
-        <MapRoutesPanel
+        {/* <MapRoutesPanel
           style={styles.routesPanel}
           routes={routes}
           selected={selectedRoutesIds}
           onPress={() => setRoutesModalOpen(true)}
-        />
+        /> */}
         <View style={styles.controlsPanel}>
           <RoundedIconBtn style={styles.controlsPanelBtn} icon="bus" onPress={() => setRoutesModalOpen(true)} />
           <RoundedIconBtn style={styles.controlsPanelBtn} icon="plus" onPress={handleZoomInPress} />
           <RoundedIconBtn style={styles.controlsPanelBtn} icon="minus" onPress={handleZoomOutPress} />
           <RoundedIconBtn style={styles.controlsPanelBtn} icon="location" />
         </View>
+        {config.env === 'dev' && (
+          <View style={styles.versionWrap}>
+            <Text style={styles.versionText}>{`v${config.version}`}</Text>
+          </View>
+        )}
       </View>
       <MapRoutesModal
         open={routesModalOpen}
@@ -222,6 +227,19 @@ const getStyles = (insets: EdgeInsets) =>
       position: 'absolute',
       top: 14 + insets.top,
       right: 14,
+    },
+    versionWrap: {
+      bottom: insets.bottom + 10,
+      justifyContent: 'center',
+      left: 10,
+      right: 10,
+      flexDirection: 'row',
+      position: 'absolute',
+      zIndex: 100,
+    },
+    versionText: {
+      fontSize: 12,
+      fontWeight: 'bold',
     },
   });
 

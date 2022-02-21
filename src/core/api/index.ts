@@ -1,4 +1,5 @@
 import { Log } from '@core/log';
+import { delayMs } from '@utils';
 
 import { TransportBus, TransportBusesLocations, TransportPrediction, TransportRoute } from './types';
 import { ApiError, ApiReqOpt, apiReqOptParamsToStr } from './utils';
@@ -16,8 +17,7 @@ const getApi = () => {
   const apiConf = getApiRoot();
 
   const apiReq = async <T = unknown>(opt: ApiReqOpt): Promise<T> => {
-    const { method = 'GET', path, data: reqData, params } = opt;
-
+    const { method = 'GET', path, data: reqData, params, retry = 0 } = opt;
     const paramsStr = params ? `?${apiReqOptParamsToStr(params)}` : '';
     const url = `${apiConf.url}${path}${paramsStr}`;
     const headers = {
@@ -27,20 +27,27 @@ const getApi = () => {
     if (reqData) {
       reqInit.body = JSON.stringify(reqData);
     }
-    log.debug('req', { url, opt: reqInit });
-    const resp = await fetch(url, reqInit);
-    log.debug('req done', { url, opt: reqInit });
-    if (!resp.ok) {
-      throw new ApiError(resp.statusText, resp.status);
-    }
-    const text = await resp.text();
-    // log.trace('req resp text', { text });
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    if (!text) return undefined as unknown as T;
+    try {
+      log.debug('req', { url, opt: reqInit });
+      const resp = await fetch(url, reqInit);
+      log.debug('req done', { url, opt: reqInit });
+      if (!resp.ok) {
+        throw new ApiError(resp.statusText, resp.status);
+      }
+      const text = await resp.text();
+      // log.trace('req resp text', { text });
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      if (!text) return undefined as unknown as T;
 
-    const data = JSON.parse(text);
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    return data as unknown as T;
+      const data = JSON.parse(text);
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      return data as unknown as T;
+    } catch (err: unknown) {
+      const waitMs = 2 ** retry * 100;
+      log.debug('datasource req err, retry', { url, waitMs });
+      await delayMs(waitMs);
+      return apiReq({ ...opt, retry: retry + 1 });
+    }
   };
 
   return {
