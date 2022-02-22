@@ -7,13 +7,14 @@ import busIcon from './assets/bus.png';
 import locationIcon from './assets/location.png';
 import minusIcon from './assets/minus.png';
 import plusIcon from './assets/plus.png';
+import menuIcon from './assets/menu.png';
 
 interface Props extends ViewStyleProps {
   icon: RoundedIconBtnType;
   onPress?: () => void;
 }
 
-type RoundedIconBtnType = 'plus' | 'minus' | 'location' | 'bus';
+type RoundedIconBtnType = 'plus' | 'minus' | 'location' | 'bus' | 'menu';
 
 export const RoundedIconBtn: FC<Props> = ({ style, icon, onPress }) => {
   const iconSrc = select(icon, {
@@ -21,6 +22,7 @@ export const RoundedIconBtn: FC<Props> = ({ style, icon, onPress }) => {
     minus: minusIcon,
     location: locationIcon,
     bus: busIcon,
+    menu: menuIcon,
   });
   return (
     <TouchableOpacity style={[styles.container, style]} onPress={onPress}>

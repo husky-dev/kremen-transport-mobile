@@ -15,6 +15,7 @@ import React, { FC, useEffect, useRef, useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import MapView, { Region } from 'react-native-maps';
 import { EdgeInsets, useSafeAreaInsets } from 'react-native-safe-area-context';
+import AboutModal from './components/AboutModal';
 
 import MapBusInfo from './components/BusInfo';
 import MapRoutesModal from './components/RotuesModal';
@@ -49,6 +50,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
   const [selectedStationId, setSelectedStationId] = useState<number | undefined>(undefined);
   const [selectedRoutesIds, setSelectedRoutesIds] = useState<number[]>(defSelectedRouteIds);
   const [routesModalOpen, setRoutesModalOpen] = useState<boolean>(false);
+  const [aboutModalOpen, setAboutModalOpen] = useState<boolean>(false);
 
   const mapRef = useRef<MapView>(null);
   const { hasLocationPermission, curPosition } = useLocation();
@@ -235,11 +237,14 @@ export const MapScreen: FC<Props> = ({ style }) => {
           selected={selectedRoutesIds}
           onPress={() => setRoutesModalOpen(true)}
         /> */}
+        <View style={styles.menuPanel}>
+          <RoundedIconBtn style={styles.controlBtn} icon="menu" onPress={() => setAboutModalOpen(true)} />
+        </View>
         <View style={styles.controlsPanel}>
-          <RoundedIconBtn style={styles.controlsPanelBtn} icon="bus" onPress={() => setRoutesModalOpen(true)} />
-          <RoundedIconBtn style={styles.controlsPanelBtn} icon="plus" onPress={handleZoomInPress} />
-          <RoundedIconBtn style={styles.controlsPanelBtn} icon="minus" onPress={handleZoomOutPress} />
-          <RoundedIconBtn style={styles.controlsPanelBtn} icon="location" onPress={handleCurPostionPress} />
+          <RoundedIconBtn style={styles.controlBtn} icon="bus" onPress={() => setRoutesModalOpen(true)} />
+          <RoundedIconBtn style={styles.controlBtn} icon="plus" onPress={handleZoomInPress} />
+          <RoundedIconBtn style={styles.controlBtn} icon="minus" onPress={handleZoomOutPress} />
+          <RoundedIconBtn style={styles.controlBtn} icon="location" onPress={handleCurPostionPress} />
         </View>
         {config.env === 'dev' && (
           <View style={styles.versionWrap}>
@@ -254,6 +259,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
         onSelectedChange={handleSelectedRoutesChange}
         onClose={() => setRoutesModalOpen(false)}
       />
+      <AboutModal open={aboutModalOpen} onClose={() => setAboutModalOpen(false)} />
       <Actionsheet isOpen={!!selectedStationId} onClose={() => setSelectedStationId(undefined)}>
         <Actionsheet.Content>{!!selectedStation && <MapStationInfo item={selectedStation} />}</Actionsheet.Content>
       </Actionsheet>
@@ -273,6 +279,12 @@ const getStyles = (insets: EdgeInsets) =>
       flex: 1,
       zIndex: 1,
     },
+    menuPanel: {
+      position: 'absolute',
+      left: 14,
+      zIndex: 2,
+      top: 14 + insets.top,
+    },
     controlsPanel: {
       position: 'absolute',
       right: 14,
@@ -281,7 +293,7 @@ const getStyles = (insets: EdgeInsets) =>
       zIndex: 2,
       justifyContent: 'center',
     },
-    controlsPanelBtn: {
+    controlBtn: {
       marginTop: 4,
       marginBottom: 4,
     },
