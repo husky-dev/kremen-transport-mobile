@@ -24,7 +24,7 @@ jobs:
     - name: "Env: setup PRD environment"
       if: ${{ startsWith(github.ref, 'refs/tags') && endsWith(github.ref, '-prd') }}
       env:
-        ENV_FILE: ${{secrets.ENVFILE_PRD}}
+        ENVFILE: ${{secrets.ENVFILE_PRD}}
       run: |
         echo "$ENVFILE" > .env
         cat .env >> $GITHUB_ENV
