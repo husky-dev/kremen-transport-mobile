@@ -2,6 +2,7 @@ import { errToStr, LatLng } from '@utils';
 import React, { createContext, FC, useContext, useEffect, useMemo, useState } from 'react';
 import { PermissionsAndroid, Platform } from 'react-native';
 import Geolocation, { GeoPosition, GeoError } from 'react-native-geolocation-service';
+import { i18n } from './i18n';
 
 import { Log } from './log';
 
@@ -42,13 +43,32 @@ export const LocationProvider: FC = ({ children }) => {
   const reqAndroidPermissions = async () => {
     log.debug('request android permissions');
     try {
-      const perm = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION, {
-        title: 'Місцезнаходження',
-        message: 'Ваше місцезнаходження необхідне для відображення його на карті і зручності користування',
-        buttonNeutral: 'Запитати пізніше',
-        buttonNegative: 'Скасувати',
-        buttonPositive: 'Надати',
-      });
+      const perm = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        i18n({
+          uk: {
+            title: 'Місцезнаходження',
+            message: 'Ваше місцезнаходження необхідне для відображення його на карті і зручності користування додатком',
+            buttonNeutral: 'Запитати пізніше',
+            buttonNegative: 'Скасувати',
+            buttonPositive: 'Надати',
+          },
+          en: {
+            title: 'Location',
+            message: 'Your location is needed to display it on the map and ease use of the app',
+            buttonNeutral: 'Ask later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'Provide',
+          },
+          ru: {
+            title: 'Местонахождение',
+            message: 'Ваше местонахождение необходимо для отображения его на карте и удобства использования приложения',
+            buttonNeutral: 'Запитати пізніше',
+            buttonNegative: 'Скасувати',
+            buttonPositive: 'Надати',
+          },
+        }),
+      );
       if (perm === 'granted') return setHasLocationPermission(true);
     } catch (err: unknown) {
       log.debug('request android permissions err', { msg: errToStr(err) });

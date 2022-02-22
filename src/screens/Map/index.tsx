@@ -1,6 +1,6 @@
 import { RoundedIconBtn } from '@components/Buttons';
 import { BusMarker, CurPositionMarker, RoutePath, StationMarker } from '@components/Map';
-import { useLocation } from '@core';
+import { i18n, useLocation } from '@core';
 import { defRoutePathColors, routeIdToColor, routeToColor, TransportStation } from '@core/api';
 import { TransportBus, TransportRoute } from '@core/api/types';
 import { config } from '@core/config';
@@ -126,7 +126,14 @@ export const MapScreen: FC<Props> = ({ style }) => {
 
   const handleCurPostionPress = () => {
     if (!hasLocationPermission) {
-      return Alert.alert('Помилка', 'Ви повині надати доступ до вашого місцезнаходження для використання цієї функції');
+      return Alert.alert(
+        i18n({ uk: 'Помилка', ru: 'Ошибка', en: 'Error' }),
+        i18n({
+          uk: 'Ви повині надати доступ до вашого місцезнаходження для використання цієї функції',
+          ru: 'Вы должны предоставить доступ к вашему местоположению для использования этой функции',
+          en: 'You should provide an access to your location to use this function',
+        }),
+      );
     }
     if (!curPosition || !mapRef.current) return;
     const { lat, lng } = curPosition;
