@@ -1,4 +1,5 @@
 import { DirectionIcon } from '@components/Transport';
+import { i18n } from '@core';
 import { api, getTransportStationPinUri, TransportPrediction, TransportStation } from '@core/api';
 import { Log } from '@core/log';
 import { useStorage } from '@core/storage';
@@ -38,14 +39,15 @@ export const MapStationInfo: FC<Props> = ({ style, item }) => {
       setPredictions(data);
     } catch (err: unknown) {
       setLoading(false);
-      setErr('Помилка отримання даних');
+      setErr(i18n({ uk: `Помилка завантаження даних`, ru: `Ошибка загрузки даных`, en: `Loading data error` }));
     }
   };
 
   const renderPredictions = () => {
     if (loading && !predictions.length) return <Spinner accessibilityLabel="Отримання даних" color="primary.500" />;
-    if (!loading && err) return <Text>{`Помилка завантаження даних`}</Text>;
-    if (!loading && !predictions.length) return <Text>{`Дані відсутні`}</Text>;
+    if (!loading && err) return <Text>{err}</Text>;
+    if (!loading && !predictions.length)
+      return <Text>{i18n({ uk: `Дані відсутні`, ru: `Даные отсутствуют`, en: `No data` })}</Text>;
     return compact(predictions.sort((a, b) => a.prediction - b.prediction).map(renderPrediction));
   };
 

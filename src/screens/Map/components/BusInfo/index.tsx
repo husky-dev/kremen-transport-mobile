@@ -1,4 +1,5 @@
 import { TransportBusRoundedIcon } from '@components/Transport';
+import { i18n } from '@core';
 import { TransportBus, TransportRoute } from '@core/api';
 import { clearRouteNumber } from '@core/utils';
 import { HStack, Text, VStack } from 'native-base';
@@ -13,7 +14,14 @@ export const MapBusInfo: FC<Props> = ({ item, route }) => {
   const getTitle = () => {
     if (!item) return '---';
     const parts: string[] = [item.name];
-    if (route) parts.push(`(маршрут: ${clearRouteNumber(route.number)})`);
+    if (route)
+      parts.push(
+        i18n({
+          uk: `(маршрут: ${clearRouteNumber(route.number)})`,
+          ru: `(маршрут: ${clearRouteNumber(route.number)})`,
+          en: `(route: ${clearRouteNumber(route.number)})`,
+        }),
+      );
     return parts.join(' ');
   };
   return (

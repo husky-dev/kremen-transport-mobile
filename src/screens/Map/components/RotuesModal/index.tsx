@@ -1,4 +1,5 @@
 import { TransportRoutesList } from '@components/Transport';
+import { i18n } from '@core';
 import { TransportRoute } from '@core/api';
 import { ViewStyleProps } from '@styles';
 import { Modal } from 'native-base';
@@ -28,7 +29,7 @@ export const MapRoutesModal: FC<Props> = ({ routes, selected, open, onClose, onS
     <Modal isOpen={open} onClose={handleClose}>
       <Modal.Content size="full">
         <Modal.CloseButton />
-        <Modal.Header>{`Маршрути`}</Modal.Header>
+        <Modal.Header>{i18n({ uk: `Маршрути`, ru: `Маршруты`, en: `Routes` })}</Modal.Header>
         <TransportRoutesList
           items={routes}
           selected={curSelected}

@@ -1,4 +1,5 @@
 import { Checkbox } from '@components/Forms';
+import { i18n } from '@core';
 import { TransportRoute, TransportType } from '@core/api';
 import { clearRouteNumber } from '@core/utils';
 import { colors, ViewStyleProps } from '@styles';
@@ -28,12 +29,12 @@ export const TransportRoutesList: FC<Props> = ({ style, selectedSectionIds, item
 
   if (selectedSectionIds?.length) {
     const items = routes.filter(itm => selectedSectionIds.includes(itm.rid));
-    sections.push({ title: 'Обрані', data: items });
+    sections.push({ title: i18n({ uk: 'Обрані', ru: 'Выбраные', en: 'Selected' }), data: items });
   }
   const trolley = routes.filter(itm => itm.type === TransportType.Trolleybus);
-  sections.push({ title: 'Тролейбуси', data: trolley });
+  sections.push({ title: i18n({ uk: 'Тролейбуси', ru: 'Тролейбусы', en: 'Trolleybuses' }), data: trolley });
   const bus = routes.filter(itm => itm.type === TransportType.Bus);
-  sections.push({ title: 'Автобуси', data: bus });
+  sections.push({ title: i18n({ uk: 'Автобуси', ru: 'Автобусы', en: 'Buses' }), data: bus });
 
   const handleCheckedChange = (itm: TransportRoute) => (checked: boolean) => {
     onSelectedChange && onSelectedChange(checked ? uniq([...selected, itm.rid]) : selected.filter(cur => cur !== itm.rid));
