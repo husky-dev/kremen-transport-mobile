@@ -85,7 +85,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
   };
 
   const handleRegionChange = (region: Region) => {
-    log.debug('region change', { ...region });
+    // log.debug('region change', { ...region });
     setRegion(region);
     lastMapRegionStorage.set(region);
   };

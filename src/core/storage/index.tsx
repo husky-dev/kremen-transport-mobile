@@ -1,5 +1,6 @@
 import { delayMs, errToStr } from '@utils';
-import React, { createContext, FC, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, FC, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { AppState } from 'react-native';
 
 import { api, isTransportBusArrOrUndef, isTransportRouteArrOrUndef, TransportBus, TransportRoute } from '../api';
 import { Log } from '../log';
@@ -28,6 +29,8 @@ export const StorageProvider: FC = ({ children }) => {
   const [buses, setBuses] = useState<TransportBus[]>([]);
   const [routes, setRoutes] = useState<TransportRoute[]>([]);
 
+  const appState = useRef(AppState.currentState);
+
   // Data updates
 
   useEffect(() => {
@@ -37,6 +40,18 @@ export const StorageProvider: FC = ({ children }) => {
   useEffect(() => {
     if (storageLoaded) updateLoadedData();
   }, [storageLoaded]);
+
+  useEffect(() => {
+    const subscr = AppState.addEventListener('change', nextAppState => {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (appState.current && appState.current.match(/inactive|background/) && nextAppState === 'active') {
+        log.debug('updating after coming from the background');
+        makeBusesUpdate();
+      }
+      appState.current = nextAppState;
+    });
+    return () => subscr.remove();
+  }, []);
 
   const loadFromStorage = async () => {
     try {
@@ -53,7 +68,7 @@ export const StorageProvider: FC = ({ children }) => {
       }
       log.debug('load from local storage done');
     } catch (err: unknown) {
-      log.err('load from local storage err', { err: errToStr(err) });
+      log.err('load from local storage err', { msg: errToStr(err) });
     } finally {
       setStorageLoaded(true);
     }
@@ -73,7 +88,7 @@ export const StorageProvider: FC = ({ children }) => {
         await makeFullUpdate();
       }
     } catch (err: unknown) {
-      log.err('update data err', { err: errToStr(err) });
+      log.err('update data err', { msg: errToStr(err) });
     }
   };
 
@@ -85,7 +100,18 @@ export const StorageProvider: FC = ({ children }) => {
       setAndSaveRoutes(routes);
       setAndSaveBuses(buses);
     } catch (err: unknown) {
-      log.err('updating data err', { err: errToStr(err) });
+      log.err('updating data err', { msg: errToStr(err) });
+    }
+  };
+
+  const makeBusesUpdate = async () => {
+    try {
+      log.debug('updating buses data');
+      const buses = await api.transport.buses();
+      log.debug('updating buses data done');
+      setAndSaveBuses(buses);
+    } catch (err: unknown) {
+      log.err('updating buses data err', { msg: errToStr(err) });
     }
   };
 
