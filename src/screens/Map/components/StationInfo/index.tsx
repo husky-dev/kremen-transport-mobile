@@ -1,3 +1,4 @@
+import { DirectionIcon } from '@components/Transport';
 import { api, getTransportStationPinUri, TransportPrediction, TransportStation } from '@core/api';
 import { Log } from '@core/log';
 import { useStorage } from '@core/storage';
@@ -58,15 +59,19 @@ export const MapStationInfo: FC<Props> = ({ style, item }) => {
     <HStack style={style} w="100%" space={3} pl="16px" pr="16px">
       <Image style={{ width: 48, height: 48 }} source={{ uri: getTransportStationPinUri({ density: 5 }) }} />
       <VStack mt="-5px">
-        <Text
-          _dark={{
-            color: 'warmGray.50',
-          }}
-          color="coolGray.800"
-          bold
-        >
-          {item.name}
-        </Text>
+        <HStack alignItems="center">
+          <DirectionIcon style={{ height: 12, width: 12 }} direction={!item.directionForward ? 'up' : 'down'} />
+          <Text
+            ml="5px"
+            _dark={{
+              color: 'warmGray.50',
+            }}
+            color="coolGray.800"
+            bold
+          >
+            {item.name}
+          </Text>
+        </HStack>
         <ScrollView horizontal mt="6px" pt="4px" pb="4px">
           <HStack space={2}>{renderPredictions()}</HStack>
         </ScrollView>
