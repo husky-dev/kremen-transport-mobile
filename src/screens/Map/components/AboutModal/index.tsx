@@ -1,4 +1,5 @@
 import { i18n } from '@core';
+import { config } from '@core/config';
 import { Log } from '@core/log';
 import { ViewStyleProps } from '@styles';
 import { errToStr } from '@utils';
@@ -39,6 +40,9 @@ export const AboutModal: FC<Props> = ({ open, onClose }) => {
           <Text fontSize="md" mt={3}>{`З питаннями, пропозиціями та інформацією про помилки звертатись:`}</Text>
           <Text fontSize="md" mt={3} underline onPress={() => handleUrlPress('mailto:hello@smartapp.dev')}>
             {`hello@smartapp.dev`}
+          </Text>
+          <Text fontSize="sm" mt={3} bold>
+            {`v${config.version} (${config.env}) © Smart App Studio`}
           </Text>
         </Modal.Body>
         <Modal.Footer>
