@@ -26,7 +26,7 @@ const log = Log('screens.Map');
 
 type Props = ViewStyleProps;
 
-const defLatitudeDelta = 0.1;
+const defLatitudeDelta = 0.03;
 const latDeltaStep = 0.5;
 const minLatDelta = 0.00156;
 const maxLatDelta = 110;
@@ -43,7 +43,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
     longitudeDelta: defLongitudeDelta,
   });
   const zoom = mapRegionToZoomLevel(region);
-  const stationsDisplayed = zoom > 13.5;
+  const stationsDisplayed = zoom > 14;
   const busPinType = zoom < 13.5 ? 'circle' : 'with-label';
 
   const [configsLoaded, setConfigsLoaded] = useState<boolean>(false);
@@ -92,7 +92,8 @@ export const MapScreen: FC<Props> = ({ style }) => {
   const handleRegionChange = (region: Region) => {
     // log.debug('region change', { ...region });
     setRegion(region);
-    lastMapRegionStorage.set(region);
+    // lastMapRegionStorage.set(region);
+    lastMapRegionStorage.remove();
   };
 
   const handleZoomInPress = async () => {
@@ -213,7 +214,9 @@ export const MapScreen: FC<Props> = ({ style }) => {
 
   const displayedRoutes = routes.filter(({ rid }) => selectedRoutesIds.includes(rid));
   const displayedBuses = buses.filter(({ rid }) => selectedRoutesIds.includes(rid));
-  const displayedStations = routesToStatiosn(displayedRoutes);
+  // Display only specifid stations
+  // const displayedStations = routesToStatiosn(displayedRoutes);
+  const displayedStations = routesToStatiosn(routes);
   const selectedStation = selectedStationId ? displayedStations.find(itm => itm.sid === selectedStationId) : undefined;
 
   const styles = getStyles(useSafeAreaInsets());
