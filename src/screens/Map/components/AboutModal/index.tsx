@@ -42,7 +42,10 @@ export const AboutModal: FC<Props> = ({ open, onClose }) => {
             {`hello@smartapp.dev`}
           </Text>
           <Text fontSize="sm" mt={3} bold>
-            {`v${config.version} (${config.env}) © Smart App Studio`}
+            {`© ${new Date().getFullYear()} Smart App Studio`}
+          </Text>
+          <Text fontSize="sm" mt={3} bold>
+            {`v${config.version} (${config.env})`}
           </Text>
         </Modal.Body>
         <Modal.Footer>
