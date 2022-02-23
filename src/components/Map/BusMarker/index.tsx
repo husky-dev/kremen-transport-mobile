@@ -1,4 +1,4 @@
-import { getTransportBusPinUri, offlineColors, TransportBus, TransportRoute } from '@core/api';
+import { getTransportBusPinUri, offlineColors, TransportBus, TransportPinType, TransportRoute } from '@core/api';
 import { clearRouteNumberTransportInfo } from '@core/utils';
 import { ColorsSet } from '@styles';
 import { ColorMode } from 'native-base';
@@ -12,10 +12,11 @@ interface Props {
   zIndex?: number;
   opacity?: number;
   theme?: ColorMode;
+  pin?: TransportPinType;
   onPress?: () => void;
 }
 
-export const BusMarker: FC<Props> = ({ item, colors, zIndex = 20, route, theme, opacity = 1.0, onPress }) => {
+export const BusMarker: FC<Props> = ({ item, colors, zIndex = 20, pin = 'with-label', route, theme, opacity = 1.0, onPress }) => {
   const handlePress = (event: MapEvent<{ action: 'marker-press'; id: string }>) => {
     event.stopPropagation();
     onPress && onPress();
@@ -24,7 +25,7 @@ export const BusMarker: FC<Props> = ({ item, colors, zIndex = 20, route, theme, 
   const { direction, type } = item;
   const number = route ? clearRouteNumberTransportInfo(route.number) : '-';
   const { light, dark } = item.offline ? offlineColors : colors;
-  const iconUri = getTransportBusPinUri({ direction, number, light, dark, type, theme: theme ? theme : undefined });
+  const iconUri = getTransportBusPinUri({ direction, number, light, dark, type, theme: theme ? theme : undefined, pin });
   const x = direction <= 180 ? 0.388 : 0.611;
   return (
     <Marker

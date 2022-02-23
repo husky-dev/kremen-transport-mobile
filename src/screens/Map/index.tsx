@@ -43,6 +43,8 @@ export const MapScreen: FC<Props> = ({ style }) => {
     longitudeDelta: defLongitudeDelta,
   });
   const zoom = mapRegionToZoomLevel(region);
+  const stationsDisplayed = zoom > 13.5;
+  const busPinType = zoom < 13.5 ? 'circle' : 'with-label';
 
   const [configsLoaded, setConfigsLoaded] = useState<boolean>(false);
   const [curPostitionLoaded, setCurPostitionLoaded] = useState<boolean>(false);
@@ -166,20 +168,21 @@ export const MapScreen: FC<Props> = ({ style }) => {
     }
     return (
       <BusMarker
-        key={`bus-${item.tid}`}
+        key={`bus-${busPinType}-${item.tid}`}
         item={item}
         route={route}
         colors={colors}
         zIndex={zIndex}
         opacity={opacity}
         theme={theme}
+        pin={busPinType}
         onPress={() => handleBusMarkerPress(item)}
       />
     );
   };
 
   const renderStation = (item: TransportStation) => {
-    if (zoom < 13.5) return null;
+    if (!stationsDisplayed) return null;
     return (
       <StationMarker
         key={`station-${item.rid}-${item.sid}`}

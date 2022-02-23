@@ -70,10 +70,13 @@ export interface TransportBusPinIcon {
   number: string;
   type: TransportType;
   theme?: 'light' | 'dark';
+  pin?: TransportPinType;
 }
 
+export type TransportPinType = 'with-label' | 'circle';
+
 export const getTransportBusPinUri = (icon: TransportBusPinIcon): string => {
-  const { version = 1, direction, type, number, light, dark, density = 3, theme = 'light' } = icon;
+  const { version = 1, direction, type, number, light, dark, density = 3, theme = 'light', pin = 'with-label' } = icon;
   const parts: string[] = [
     `d=${density}`,
     `direction=${direction}`,
@@ -82,6 +85,7 @@ export const getTransportBusPinUri = (icon: TransportBusPinIcon): string => {
     `dark=${encodeURIComponent(dark)}`,
     `type=${type === TransportType.Bus ? 'bus' : 'trolleybus'}`,
     `theme=${theme}`,
+    `pin=${pin}`,
     `v=${version}`,
   ];
   return `https://api.kremen.dev/img/transport/bus/pin?${parts.join('&')}`;
