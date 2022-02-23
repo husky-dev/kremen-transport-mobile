@@ -9,7 +9,7 @@ import { defSelectedRouteIds } from '@core/data';
 import { Log } from '@core/log';
 import { getStorageParam, useStorage } from '@core/storage';
 import { getScreenAspectRatio, mapCustomStyle, mapDarkStyle, ViewStyleProps } from '@styles';
-import { errToStr, isMapRegion, isNumArrOrUndef, latLngToLatitudeLongitude } from '@utils';
+import { errToStr, isMapRegion, isNumArrOrUndef, latLngToLatitudeLongitude, mapRegionToZoomLevel } from '@utils';
 import { Actionsheet, useColorMode } from 'native-base';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
@@ -42,6 +42,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
     latitudeDelta: defLatitudeDelta,
     longitudeDelta: defLongitudeDelta,
   });
+  const zoom = mapRegionToZoomLevel(region);
 
   const [configsLoaded, setConfigsLoaded] = useState<boolean>(false);
   const [curPostitionLoaded, setCurPostitionLoaded] = useState<boolean>(false);
@@ -177,6 +178,19 @@ export const MapScreen: FC<Props> = ({ style }) => {
     );
   };
 
+  const renderStation = (item: TransportStation) => {
+    if (zoom < 13.5) return null;
+    return (
+      <StationMarker
+        key={`station-${item.rid}-${item.sid}`}
+        item={item}
+        zIndex={10}
+        theme={theme}
+        onPress={() => handleStationMarkerPress(item)}
+      />
+    );
+  };
+
   const renderRoutePath = (item: TransportRoute) => {
     let colors = defRoutePathColors;
     let opacity = 0.5;
@@ -219,15 +233,7 @@ export const MapScreen: FC<Props> = ({ style }) => {
           onRegionChange={handleRegionChange}
         >
           {displayedRoutes.map(renderRoutePath)}
-          {displayedStations.map(item => (
-            <StationMarker
-              key={`station-${item.rid}-${item.sid}`}
-              item={item}
-              zIndex={10}
-              theme={theme}
-              onPress={() => handleStationMarkerPress(item)}
-            />
-          ))}
+          {displayedStations.map(renderStation)}
           {displayedBuses.map(renderBusMarker)}
           {hasLocationPermission && !!curPosition && <CurPositionMarker position={curPosition} />}
         </MapView>
